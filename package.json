@@ -12,7 +12,7 @@
     "build": "tsc",
     "typecheck": "tsc --noEmit",
     "typecheck:legacy": "tsc6 --noEmit",
-    "prisma migrate": "prisma migrate dev --name"
+    "prisma:migrate": "prisma migrate dev"
   },
   "keywords": [],
   "author": "",

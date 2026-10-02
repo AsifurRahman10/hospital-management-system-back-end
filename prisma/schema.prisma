@@ -58,6 +58,7 @@ model User {
   updatedAt     DateTime  @updatedAt
   sessions      Session[]
   accounts      Account[]
+  patient     Patient?
 
   @@unique([email])
   @@map("user")
@@ -109,4 +110,21 @@ model Verification {
 
   @@index([identifier])
   @@map("verification")
+}
+
+model Patient{
+  id String @id @default(uuid(7))
+  name String @db.VarChar(100)
+  email String @db.VarChar(100) @unique
+  profilePhoto String? 
+  contactNumber String?
+  address String?
+  isDeleted Boolean @default(false)
+  deletedAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // relation
+  userId String @unique
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
