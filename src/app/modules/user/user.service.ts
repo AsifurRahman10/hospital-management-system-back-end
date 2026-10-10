@@ -24,6 +24,7 @@ interface ICreateDoctorPayload {
 
 const createDoctor = async (payload: ICreateDoctorPayload) => {
   const specialties: Specialty[] = []
+
   for (const item of payload.specialties || []) {
     const specialty = await prisma.specialty.findUnique({
       where: {
@@ -35,9 +36,7 @@ const createDoctor = async (payload: ICreateDoctorPayload) => {
       throw new Error(`Specialty with id ${item} not found`)
     }
 
-    if (specialty) {
-      specialties.push(specialty)
-    }
+    specialties.push(specialty)
   }
   const isUserExists = await prisma.user.findUnique({
     where: {
@@ -67,6 +66,7 @@ const createDoctor = async (payload: ICreateDoctorPayload) => {
           ...payload.doctor
         }
       })
+
       const doctorSpecialtiesData = specialties.map((specialty) => ({
         doctorId: doctor.id,
         specialtyId: specialty.id
@@ -75,7 +75,6 @@ const createDoctor = async (payload: ICreateDoctorPayload) => {
       await tx.doctorSpecialty.createMany({
         data: doctorSpecialtiesData
       })
-
       const doctorDataFiltered = await tx.doctor.findUnique({
         where: {
           id: doctor.id
@@ -103,12 +102,12 @@ const createDoctor = async (payload: ICreateDoctorPayload) => {
               name: true
             }
           },
-          specialties: {
+          doctorSpecialties: {
             select: {
               specialty: {
                 select: {
-                  id: true,
-                  name: true
+                  title: true,
+                  description: true
                 }
               }
             }
