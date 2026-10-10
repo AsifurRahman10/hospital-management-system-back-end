@@ -3,6 +3,7 @@ import { UserController } from './user.controller'
 import { validateRequest } from '../../middleware/validateRequest'
 import { UserValidation } from './user.validation'
 import checkAuth from '../../middleware/checkAuth'
+import { Role } from '../../../../generated/prisma/enums'
 
 const router = Router()
 
@@ -14,14 +15,14 @@ router.post(
 
 router.post(
   '/create-admin',
-  checkAuth('SUPER_ADMIN'),
+  checkAuth(Role.SUPER_ADMIN),
   validateRequest(UserValidation.createAdminValidationSchema),
   UserController.createAdmin
 )
 
 router.post(
   '/create-super-admin',
-  checkAuth('SUPER_ADMIN'),
+  checkAuth(Role.SUPER_ADMIN),
   validateRequest(UserValidation.createSuperAdminValidationSchema),
   UserController.createSuperAdmin
 )
