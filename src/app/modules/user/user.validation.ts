@@ -24,6 +24,30 @@ const createDoctorValidationSchema = z.object({
   specialties: z.array(z.uuid()).optional()
 })
 
+// Create admin validation
+const createAdminValidationSchema = z.object({
+  password: z.string().min(8),
+
+  admin: z.object({
+    name: z.string().min(1, 'Name is required'),
+    email: z.email('Invalid email address'),
+    profilePhoto: z.url().optional(),
+    contactNumber: z.string().optional()
+  })
+})
+
+// Create super admin validation
+const createSuperAdminValidationSchema = z.object({
+  password: z.string().min(8),
+
+  superAdmin: z.object({
+    name: z.string().min(1, 'Name is required'),
+    email: z.email('Invalid email address'),
+    profilePhoto: z.url().optional(),
+    contactNumber: z.string().optional()
+  })
+})
+
 // Update doctor validation
 const updateDoctorValidationSchema = z.object({
   body: z.object({
@@ -49,5 +73,7 @@ const updateDoctorValidationSchema = z.object({
 
 export const UserValidation = {
   createDoctorValidationSchema,
+  createAdminValidationSchema,
+  createSuperAdminValidationSchema,
   updateDoctorValidationSchema
 }

@@ -3,6 +3,7 @@ import { specialtyRoutes } from '../modules/specialty/specialty.route'
 import { AuthRoutes } from '../modules/auth/auth.route'
 import { UserRoutes } from '../modules/user/user.router'
 import { DoctorRoutes } from '../modules/doctor/doctor.route'
+import { AdminRoutes } from '../modules/admin/admin.route'
 
 export const router = Router()
 
@@ -22,6 +23,10 @@ const moduleRouter = [
   {
     path: '/doctor',
     route: DoctorRoutes
+  },
+  {
+    path: '/admin',
+    route: AdminRoutes
   }
 ]
 
