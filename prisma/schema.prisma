@@ -28,6 +28,7 @@ model Specialty {
   @@index([isDeleted], name: "idx_specialty_isDeleted")
   @@index([title], name: "idx_specialty_title")
   @@map("specialties")
+  doctorSpecialties DoctorSpecialty[]
 }
 
 enum Role{
@@ -59,6 +60,7 @@ model User {
   sessions      Session[]
   accounts      Account[]
   patient     Patient?
+  doctor      Doctor?
 
   @@unique([email])
   @@map("user")
@@ -127,4 +129,56 @@ model Patient{
   // relation
   userId String @unique
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum Gender{
+  MALE
+  FEMALE
+  OTHER
+}
+
+model Doctor{
+  id String @id @default(uuid(7))
+  name String 
+  email String @unique
+  profilePhoto String? 
+  contactNumber String?
+  address String?
+  isDeleted Boolean @default(false)
+  deletedAt DateTime?
+
+  registrationNumber String? @unique
+  experience Int?
+  gender Gender
+  appointmentFee Float?
+  qualifications String?
+  currentWorkplace String?
+  designation String?
+  averageRating Float? @default(0.0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // relation
+  userId String @unique
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@index([email], name: "idx_doctor_email")
+  @@index([isDeleted], name: "idx_doctor_isDeleted")
+
+  @@map("doctor")
+  doctorSpecialties DoctorSpecialty[]
+}
+
+model DoctorSpecialty{
+  id String @id @default(uuid(7))
+  doctorId String
+  specialtyId String
+
+  // relation
+  doctor Doctor @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  specialty Specialty @relation(fields: [specialtyId], references: [id], onDelete: Cascade)
+
+  @@unique([doctorId, specialtyId])
+  @@index([doctorId], name: "idx_doctor_specialty_doctorId")
+  @@index([specialtyId], name: "idx_doctor_specialty_specialtyId")
+  @@map("doctor_specialty")
 }
