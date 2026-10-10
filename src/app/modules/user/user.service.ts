@@ -120,13 +120,13 @@ const createDoctor = async (payload: ICreateDoctorPayload) => {
     return doctorData
   } catch (error) {
     console.log(error)
-
     await prisma.user.delete({
       where: {
         id: user.user.id
       }
     })
   }
+  throw new Error('Failed to create doctor')
 }
 
 export const UserService = {
