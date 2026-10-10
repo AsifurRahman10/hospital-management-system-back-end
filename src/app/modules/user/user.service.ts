@@ -2,6 +2,8 @@ import { Specialty } from '../../../../generated/prisma/client'
 import { Gender, Role } from '../../../../generated/prisma/enums'
 import { auth } from '../../lib/auth'
 import { prisma } from '../../lib/prisma'
+import AppError from '../../shared/AppError'
+import httpStatus from 'http-status'
 
 interface ICreateDoctorPayload {
   password: string
@@ -33,7 +35,10 @@ const createDoctor = async (payload: ICreateDoctorPayload) => {
     })
 
     if (!specialty) {
-      throw new Error(`Specialty with id ${item} not found`)
+      throw new AppError(
+        httpStatus.NOT_FOUND,
+        `Specialty with id ${item} not found`
+      )
     }
 
     specialties.push(specialty)
@@ -45,7 +50,10 @@ const createDoctor = async (payload: ICreateDoctorPayload) => {
   })
 
   if (isUserExists) {
-    throw new Error(`User with email ${payload.doctor.email} already exists`)
+    throw new AppError(
+      httpStatus.CONFLICT,
+      `User with email ${payload.doctor.email} already exists`
+    )
   }
 
   const user = await auth.api.signUpEmail({
@@ -126,7 +134,10 @@ const createDoctor = async (payload: ICreateDoctorPayload) => {
       }
     })
   }
-  throw new Error('Failed to create doctor')
+  throw new AppError(
+    httpStatus.INTERNAL_SERVER_ERROR,
+    'Failed to create doctor'
+  )
 }
 
 export const UserService = {
