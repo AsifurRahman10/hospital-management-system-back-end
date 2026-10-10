@@ -1,0 +1,610 @@
+{
+	"info": {
+		"_postman_id": "5be6ec74-f8bc-4a3b-b9ea-312443d5d391",
+		"name": "HMS",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "40151530",
+		"_collection_link": "https://team-virus.postman.co/workspace/Team-virus-Workspace~1bca1256-8c64-4f9a-88fb-84aae9fac6fe/collection/40151530-5be6ec74-f8bc-4a3b-b9ea-312443d5d391?action=share&source=collection_link&creator=40151530"
+	},
+	"item": [
+		{
+			"name": "Specialty",
+			"item": [
+				{
+					"name": "create-specialty",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Test_2\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{localurl}}api/v1/specialty",
+							"host": [
+								"{{localurl}}api"
+							],
+							"path": [
+								"v1",
+								"specialty"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update-specialty",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Test 2\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{localurl}}api/v1/specialty/01a0e2ac-e293-752a-bcda-d149710948ba",
+							"host": [
+								"{{localurl}}api"
+							],
+							"path": [
+								"v1",
+								"specialty",
+								"01a0e2ac-e293-752a-bcda-d149710948ba"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete-specialty",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Test 2\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{localurl}}api/v1/specialty/01a0e2ac-e293-752a-bcda-d149710948ba",
+							"host": [
+								"{{localurl}}api"
+							],
+							"path": [
+								"v1",
+								"specialty",
+								"01a0e2ac-e293-752a-bcda-d149710948ba"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get-all-specialty",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Test\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{localurl}}api/v1/specialty",
+							"host": [
+								"{{localurl}}api"
+							],
+							"path": [
+								"v1",
+								"specialty"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get-single-specialty",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Test\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{localurl}}api/v1/specialty/01a0e2ac-e293-752a-bcda-d149710948ba",
+							"host": [
+								"{{localurl}}api"
+							],
+							"path": [
+								"v1",
+								"specialty",
+								"01a0e2ac-e293-752a-bcda-d149710948ba"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "register-patient",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"test\",\n    \"email\": \"test@gmail.com\",\n    \"password\" : \"12345556\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{localurl}}api/v1/auth/register",
+							"host": [
+								"{{localurl}}api"
+							],
+							"path": [
+								"v1",
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "login",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"test@gmail.com\",\n    \"password\" : \"12345556asc\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{localurl}}api/v1/auth/login",
+							"host": [
+								"{{localurl}}api"
+							],
+							"path": [
+								"v1",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "register-user",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"password\": \"Doctor@12345\",\n  \"doctor\": {\n    \"name\": \"Dr. Rahman Ahmed Sabbir\",\n    \"profilePhoto\": \"https://example.com/images/doctor.jpg\",\n    \"contactNumber\": \"+8801712345678\",\n    \"address\": \"Dhanmondi, Dhaka, Bangladesh\",\n    \"registrationNumber\": \"BMDC-A-123456\",\n    \"experience\": 8,\n    \"gender\": \"MALE\",\n    \"appointmentFee\": 1000,\n    \"qualifications\": \"MBBS, FCPS (Medicine)\",\n    \"currentWorkplace\": \"Dhaka Medical College Hospital\",\n    \"designation\": \"Consultant Physician\"\n  },\n  \"specialties\": [\"01a124f9-1a35-731c-88ef-4d903fc66d79\", \"01a124f9-551d-71f4-80b1-9ae4c595ef64\"]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{localurl}}api/v1/user/register-doctor",
+							"host": [
+								"{{localurl}}api"
+							],
+							"path": [
+								"v1",
+								"user",
+								"register-doctor"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create-admin",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"password\":\"admin12345\",\"admin\":{\"name\":\"John Admin\",\"email\":\"john.admin@example.com\",\"contactNumber\":\"+1234567890\",\"profilePhoto\":\"https://example.com/photo.jpg\"}}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{localurl}}api/v1/user/create-admin",
+							"host": [
+								"{{localurl}}api"
+							],
+							"path": [
+								"v1",
+								"user",
+								"create-admin"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create-super-admin",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{localurl}}api/v1/user/create-super-admin",
+							"host": [
+								"{{localurl}}api"
+							],
+							"path": [
+								"v1",
+								"user",
+								"create-super-admin"
+							]
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"password\": \"super12345\",\n    \"superAdmin\": {\n        \"name\": \"Jane Root\",\n        \"email\": \"jane.root@example.com\",\n        \"contactNumber\": \"+1987654321\",\n        \"profilePhoto\": \"https://example.com/jane.jpg\"\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Doctor",
+			"item": [
+				{
+					"name": "all-doctor",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"password\": \"Doctor@12345\",\n  \"doctor\": {\n    \"name\": \"Dr. Rahman Ahmed\",\n    \"email\": \"rahman.ahmed@example.com\",\n    \"profilePhoto\": \"https://example.com/images/doctor.jpg\",\n    \"contactNumber\": \"+8801712345678\",\n    \"address\": \"Dhanmondi, Dhaka, Bangladesh\",\n    \"registrationNumber\": \"BMDC-A-12345\",\n    \"experience\": 8,\n    \"gender\": \"MALE\",\n    \"appointmentFee\": 1000,\n    \"qualifications\": \"MBBS, FCPS (Medicine)\",\n    \"currentWorkplace\": \"Dhaka Medical College Hospital\",\n    \"designation\": \"Consultant Physician\"\n  },\n  \"specialties\": [\"01a124f9-1a35-731c-88ef-4d903fc66d79\", \"01a124f9-551d-71f4-80b1-9ae4c595ef64\"]\n}"
+						},
+						"url": {
+							"raw": "{{localurl}}api/v1/doctor",
+							"host": [
+								"{{localurl}}api"
+							],
+							"path": [
+								"v1",
+								"doctor"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update-doctor",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\" : \"Dr. Rahman Ahmed Asifur\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{localurl}}api/v1/doctor/01a12573-516c-7348-a698-0bafd69fe57b",
+							"host": [
+								"{{localurl}}api"
+							],
+							"path": [
+								"v1",
+								"doctor",
+								"01a12573-516c-7348-a698-0bafd69fe57b"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get-doctor-by-id",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\" : \"Dr. Rahman Ahmed Asif\"\n}"
+						},
+						"url": {
+							"raw": "{{localurl}}api/v1/doctor/01a12512-cd12-77cd-969a-de42a218891c",
+							"host": [
+								"{{localurl}}api"
+							],
+							"path": [
+								"v1",
+								"doctor",
+								"01a12512-cd12-77cd-969a-de42a218891c"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete-doctor-by-id",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\" : \"Dr. Rahman Ahmed Asif\"\n}"
+						},
+						"url": {
+							"raw": "{{localurl}}api/v1/doctor/01a12512-cd12-77cd-969a-de42a218891c",
+							"host": [
+								"{{localurl}}api"
+							],
+							"path": [
+								"v1",
+								"doctor",
+								"01a12512-cd12-77cd-969a-de42a218891c"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Admin",
+			"item": [
+				{
+					"name": "get-all-admins",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{localurl}}api/v1/admin",
+							"host": [
+								"{{localurl}}api"
+							],
+							"path": [
+								"v1",
+								"admin"
+							]
+						}
+					},
+					"response": [],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					}
+				},
+				{
+					"name": "get-admin-by-id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{localurl}}api/v1/admin/:adminId",
+							"host": [
+								"{{localurl}}api"
+							],
+							"path": [
+								"v1",
+								"admin",
+								":adminId"
+							]
+						}
+					},
+					"response": [],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					}
+				},
+				{
+					"name": "update-admin",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{localurl}}api/v1/admin/:adminId",
+							"host": [
+								"{{localurl}}api"
+							],
+							"path": [
+								"v1",
+								"admin",
+								":adminId"
+							]
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"John Updated\",\n    \"contactNumber\": \"+1111111111\",\n    \"profilePhoto\": \"https://example.com/new.jpg\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete-admin-by-id",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{localurl}}api/v1/admin/:adminId",
+							"host": [
+								"{{localurl}}api"
+							],
+							"path": [
+								"v1",
+								"admin",
+								":adminId"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Super Admin",
+			"item": [
+				{
+					"name": "get-all-super-admins",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{localurl}}api/v1/super-admin",
+							"host": [
+								"{{localurl}}api"
+							],
+							"path": [
+								"v1",
+								"super-admin"
+							]
+						}
+					},
+					"response": [],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					}
+				},
+				{
+					"name": "get-super-admin-by-id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{localurl}}api/v1/super-admin/:superAdminId",
+							"host": [
+								"{{localurl}}api"
+							],
+							"path": [
+								"v1",
+								"super-admin",
+								":superAdminId"
+							]
+						}
+					},
+					"response": [],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					}
+				},
+				{
+					"name": "update-super-admin",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{localurl}}api/v1/super-admin/:superAdminId",
+							"host": [
+								"{{localurl}}api"
+							],
+							"path": [
+								"v1",
+								"super-admin",
+								":superAdminId"
+							]
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Jane Updated\",\n    \"contactNumber\": \"+2222222222\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete-super-admin-by-id",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{localurl}}api/v1/super-admin/:superAdminId",
+							"host": [
+								"{{localurl}}api"
+							],
+							"path": [
+								"v1",
+								"super-admin",
+								":superAdminId"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
