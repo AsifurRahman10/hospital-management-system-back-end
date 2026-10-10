@@ -4,6 +4,7 @@ import { AuthRoutes } from '../modules/auth/auth.route'
 import { UserRoutes } from '../modules/user/user.router'
 import { DoctorRoutes } from '../modules/doctor/doctor.route'
 import { AdminRoutes } from '../modules/admin/admin.route'
+import { SuperAdminRoutes } from '../modules/superAdmin/superAdmin.route'
 
 export const router = Router()
 
@@ -27,6 +28,10 @@ const moduleRouter = [
   {
     path: '/admin',
     route: AdminRoutes
+  },
+  {
+    path: '/super-admin',
+    route: SuperAdminRoutes
   }
 ]
 
