@@ -22,6 +22,12 @@ const loginUser = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const data = await AuthServices.loginUser(req.body)
 
+    const cookies = data.headers.getSetCookie()
+
+    if (cookies.length > 0) {
+      res.setHeader('Set-Cookie', cookies)
+    }
+
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,

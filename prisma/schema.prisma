@@ -224,3 +224,6 @@ model SuperAdmin {
   @@index([isDeleted], name: "idx_super_admin_isDeleted")
   @@map("super_admin")
 }
+
+
+

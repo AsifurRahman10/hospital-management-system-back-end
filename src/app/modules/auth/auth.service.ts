@@ -61,7 +61,8 @@ const loginUser = async (payload: ILoginPatientPayload) => {
     body: {
       email,
       password
-    }
+    },
+    returnHeaders: true
   })
 
   return getUser
