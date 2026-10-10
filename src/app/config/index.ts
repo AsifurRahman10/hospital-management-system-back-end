@@ -1,4 +1,6 @@
 import dotenv from 'dotenv'
+import AppError from '../shared/AppError'
+import httpStatus from 'http-status'
 dotenv.config()
 
 interface TEnvVars {
@@ -20,7 +22,10 @@ const envVars = (): TEnvVars => {
 
   for (const envVar of requiredEnvVars) {
     if (!process.env[envVar]) {
-      throw new Error(`Missing required environment variable: ${envVar}`)
+      throw new AppError(
+        httpStatus.INTERNAL_SERVER_ERROR,
+        `Missing required environment variable: ${envVar}`
+      )
     }
   }
 

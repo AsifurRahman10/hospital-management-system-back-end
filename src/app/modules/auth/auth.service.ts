@@ -1,6 +1,8 @@
 import { Role } from '../../../../generated/prisma/client'
 import { auth } from '../../lib/auth'
 import { prisma } from '../../lib/prisma'
+import AppError from '../../shared/AppError'
+import httpStatus from 'http-status'
 
 interface IRegisterPatientPayload {
   name: string
@@ -20,7 +22,10 @@ const registerPatient = async (payload: IRegisterPatientPayload) => {
   })
 
   if (!createUser.user) {
-    throw new Error('Failed to create new user')
+    throw new AppError(
+      httpStatus.INTERNAL_SERVER_ERROR,
+      'Failed to create new user'
+    )
   }
 
   // add new patient
