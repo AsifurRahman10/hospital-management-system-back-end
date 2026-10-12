@@ -62,7 +62,7 @@ const updateAdmin = async (payload: UpdateAdminPayload) => {
   return updatedAdmin
 }
 
-const deleteAdmin = async (id: string) => {
+const deleteAdmin = async (id: string, userId: string) => {
   const existingAdmin = await prisma.admin.findFirst({
     where: {
       id,
@@ -72,6 +72,13 @@ const deleteAdmin = async (id: string) => {
 
   if (!existingAdmin) {
     throw new AppError(httpStatus.NOT_FOUND, 'Admin not found')
+  }
+
+  if (existingAdmin.id !== userId) {
+    throw new AppError(
+      httpStatus.FORBIDDEN,
+      'You are not allow to make this request'
+    )
   }
 
   const deletedAdmin = await prisma.admin.update({
