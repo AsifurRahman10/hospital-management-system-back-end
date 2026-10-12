@@ -71,19 +71,17 @@ const changePassword = catchAsync(
 )
 
 const logout = catchAsync(async (req: Request, res: Response) => {
-  const { headers, response } = await AuthServices.logout(
-    fromNodeHeaders(req.headers)
-  )
+  const response = await AuthServices.logout(fromNodeHeaders(req.headers))
 
-  for (const cookie of headers.getSetCookie()) {
+  response.headers.getSetCookie().forEach((cookie) => {
     res.append('Set-Cookie', cookie)
-  }
+  })
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: 'Logged out successfully',
-    data: response
+    data: null
   })
 })
 

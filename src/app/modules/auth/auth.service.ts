@@ -118,7 +118,7 @@ const changePassword = async (
 const logout = async (headers: Headers) => {
   return auth.api.signOut({
     headers,
-    returnHeaders: true
+    asResponse: true
   })
 }
 
