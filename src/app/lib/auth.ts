@@ -1,46 +1,48 @@
-import { betterAuth, boolean } from "better-auth";
-import { prismaAdapter } from "better-auth/adapters/prisma";
-import { prisma } from "./prisma";
-import { Role, UserStatus } from "../../../generated/prisma/enums";
+import { betterAuth, boolean } from 'better-auth'
+import { prismaAdapter } from 'better-auth/adapters/prisma'
+import { prisma } from './prisma'
+import { Role, UserStatus } from '../../../generated/prisma/enums'
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
-    provider: "postgresql",
+    provider: 'postgresql'
   }),
   emailAndPassword: {
-    enabled: true,
+    enabled: true
   },
   user: {
     additionalFields: {
       role: {
-        type: "string",
+        type: 'string',
         required: true,
-        defaultValue: Role.PATIENT,
+        defaultValue: Role.PATIENT
       },
       status: {
-        type: "string",
+        type: 'string',
         required: true,
-        defaultValue: UserStatus.ACTIVE,
+        defaultValue: UserStatus.ACTIVE
       },
       needPasswordChange: {
-        type: "boolean",
+        type: 'boolean',
         required: false,
-        defaultValue: true,
+        defaultValue: true
       },
       isDeleted: {
-        type: "boolean",
+        type: 'boolean',
         required: false,
-        defaultValue: false,
+        defaultValue: false
       },
       deletedAt: {
-        type: "date",
+        type: 'date',
         required: false,
-        defaultValue: null,
-      },
-    },
-  },
+        defaultValue: null
+      }
+    }
+  }
   // trustedOrigins: [process.env.BETTER_AUTH_URL || "http://localhost:5000"],
   // advanced: {
   //   disableCSRFCheck: true,
   // },
-});
+})
+
+export type AuthSession = typeof auth.$Infer.Session

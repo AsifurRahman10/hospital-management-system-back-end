@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express'
+import type { Request, Response, NextFunction } from 'express'
 import httpStatus from 'http-status'
 import { fromNodeHeaders } from 'better-auth/node'
 import { Role, UserStatus } from '../../../generated/prisma/enums'
@@ -40,9 +40,13 @@ const checkAuth = (...allowedRoles: Role[]) => {
         })
       }
 
-      // Make the authenticated user available to controllers
-      res.locals.user = user
-      res.locals.session = sessionData.session
+      // Make the authenticated session available to downstream middleware and controllers
+      req.user = {
+        id: user.id,
+        role: user.role,
+        email: user.email
+      }
+      req.session = sessionData.session
 
       next()
     } catch (error) {

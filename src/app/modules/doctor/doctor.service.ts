@@ -1,3 +1,4 @@
+import { Gender } from '../../../../generated/prisma/enums'
 import { prisma } from '../../lib/prisma'
 import AppError from '../../shared/AppError'
 import httpStatus from 'http-status'
@@ -48,7 +49,7 @@ interface UpdateDoctorPayload {
   address?: string
   registrationNumber?: string
   experience?: number
-  gender?: 'MALE' | 'FEMALE' | 'OTHER'
+  gender?: Gender
   appointmentFee?: number
   qualifications?: string
   currentWorkplace?: string
@@ -57,7 +58,6 @@ interface UpdateDoctorPayload {
 }
 
 const updateDoctor = async (payload: UpdateDoctorPayload) => {
-  console.log(payload)
   const { specialties, ...doctorData } = payload
 
   const existingDoctor = await prisma.doctor.findFirst({

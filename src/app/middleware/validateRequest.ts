@@ -7,7 +7,6 @@ export const validateRequest = (zodSchema: z.ZodSchema) => {
     if (!parseData.success) {
       next(parseData.error)
     }
-    console.log(parseData)
     req.body = parseData.data
     next()
   }
