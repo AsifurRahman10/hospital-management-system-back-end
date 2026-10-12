@@ -15,4 +15,6 @@ router.post(
   AuthController.changePassword
 )
 
+router.post('/logout', checkAuth(...Object.values(Role)), AuthController.logout)
+
 export const AuthRoutes = router

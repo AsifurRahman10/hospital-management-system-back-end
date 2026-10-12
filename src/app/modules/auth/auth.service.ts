@@ -115,9 +115,17 @@ const changePassword = async (
   return result
 }
 
+const logout = async (headers: Headers) => {
+  return auth.api.signOut({
+    headers,
+    returnHeaders: true
+  })
+}
+
 export const AuthServices = {
   registerPatient,
   loginUser,
   getMe,
-  changePassword
+  changePassword,
+  logout
 }
