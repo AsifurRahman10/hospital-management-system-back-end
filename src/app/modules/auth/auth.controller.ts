@@ -4,6 +4,7 @@ import catchAsync from '../../shared/catchAsync'
 import { AuthServices } from './auth.service'
 import sendResponse from '../../shared/sendResponse'
 import httpStatus from 'http-status'
+import { fromNodeHeaders } from 'better-auth/node'
 
 const registerPatient = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -51,4 +52,27 @@ const getMe = catchAsync(
   }
 )
 
-export const AuthController = { registerPatient, loginUser, getMe }
+const changePassword = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { oldPassword, newPassword } = req.body
+
+    await AuthServices.changePassword(
+      oldPassword,
+      newPassword,
+      fromNodeHeaders(req.headers)
+    )
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'Password changed successfully'
+    })
+  }
+)
+
+export const AuthController = {
+  registerPatient,
+  loginUser,
+  getMe,
+  changePassword
+}

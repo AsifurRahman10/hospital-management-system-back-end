@@ -98,4 +98,26 @@ const getMe = async (userId: string) => {
   return isUserExist
 }
 
-export const AuthServices = { registerPatient, loginUser, getMe }
+const changePassword = async (
+  oldPassword: string,
+  newPassword: string,
+  headers: Headers
+) => {
+  const result = await auth.api.changePassword({
+    body: {
+      currentPassword: oldPassword,
+      newPassword,
+      revokeOtherSessions: true
+    },
+    headers: headers
+  })
+
+  return result
+}
+
+export const AuthServices = {
+  registerPatient,
+  loginUser,
+  getMe,
+  changePassword
+}

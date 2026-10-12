@@ -4,6 +4,7 @@ import catchAsync from '../../shared/catchAsync'
 import sendResponse from '../../shared/sendResponse'
 import httpStatus from 'http-status'
 import { AdminService } from './admin.service'
+import { fromNodeHeaders } from 'better-auth/node'
 
 const getAllAdmins = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {

@@ -9,4 +9,10 @@ router.post('/register', AuthController.registerPatient)
 router.get('/login', AuthController.loginUser)
 router.get('/me', checkAuth(...Object.values(Role)), AuthController.getMe)
 
+router.post(
+  '/change-password',
+  checkAuth(...Object.values(Role)),
+  AuthController.changePassword
+)
+
 export const AuthRoutes = router
