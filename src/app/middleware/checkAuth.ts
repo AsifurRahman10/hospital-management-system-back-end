@@ -3,6 +3,7 @@ import httpStatus from 'http-status'
 import { fromNodeHeaders } from 'better-auth/node'
 import { Role, UserStatus } from '../../../generated/prisma/enums'
 import { auth } from '../lib/auth'
+import { prisma } from '../lib/prisma'
 
 const checkAuth = (...allowedRoles: Role[]) => {
   return async (req: Request, res: Response, next: NextFunction) => {
@@ -19,7 +20,19 @@ const checkAuth = (...allowedRoles: Role[]) => {
         })
       }
 
-      const user = sessionData.user
+      const betterAuthUser = sessionData.user
+      const user = await prisma.user.findUnique({
+        where: {
+          email: betterAuthUser.email
+        }
+      })
+      console.log(user)
+      if (!user) {
+        return res.status(httpStatus.UNAUTHORIZED).json({
+          success: false,
+          message: 'Authentication required'
+        })
+      }
 
       // Check whether the account is blocked or deleted
       if (user.status !== UserStatus.ACTIVE || user.isDeleted) {
@@ -39,7 +52,6 @@ const checkAuth = (...allowedRoles: Role[]) => {
           message: 'You do not have permission to access this resource'
         })
       }
-
       // Make the authenticated session available to downstream middleware and controllers
       req.user = {
         id: user.id,

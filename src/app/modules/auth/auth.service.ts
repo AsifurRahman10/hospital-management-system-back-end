@@ -68,4 +68,34 @@ const loginUser = async (payload: ILoginPatientPayload) => {
   return getUser
 }
 
-export const AuthServices = { registerPatient, loginUser }
+const getMe = async (userId: string) => {
+  console.log(userId)
+  const isUserExist = await prisma.user.findUnique({
+    where: { id: userId },
+    include: {
+      patient: {
+        include: {
+          appointments: true
+          // reviews: true
+          // prescriptions: true
+        }
+      },
+      doctor: {
+        include: {
+          doctorSpecialties: true,
+          appointments: true
+          // reviews: true,
+          // prescriptions: true
+        }
+      },
+      admin: true
+    }
+  })
+
+  if (!isUserExist) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found')
+  }
+  return isUserExist
+}
+
+export const AuthServices = { registerPatient, loginUser, getMe }
