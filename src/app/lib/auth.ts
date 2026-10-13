@@ -4,11 +4,14 @@ import { prisma } from './prisma'
 import { Role, UserStatus } from '../../../generated/prisma/enums'
 import { emailOTP } from 'better-auth/plugins'
 import { sendEmail } from '../utils/email'
+import { envConfig } from '../config'
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
     provider: 'postgresql'
   }),
+  baseURL: envConfig.BETTER_AUTH_URL,
+  secret: envConfig.BETTER_AUTH_SECRET,
   emailAndPassword: {
     enabled: true
   },
@@ -68,17 +71,72 @@ export const auth = betterAuth({
               }
             })
           }
+        } else if (type === 'forget-password') {
+          const user = await prisma.user.findUnique({
+            where: {
+              email
+            }
+          })
+
+          if (user) {
+            sendEmail({
+              to: email,
+              subject: 'Reset your password',
+              templateName: 'otp',
+              templateData: {
+                name: user.name,
+                otp
+              }
+            })
+          }
         }
       },
       expiresIn: 2 * 60,
       otpLength: 6
     })
-  ]
-
-  // trustedOrigins: [process.env.BETTER_AUTH_URL || "http://localhost:5000"],
-  // advanced: {
-  //   disableCSRFCheck: true,
-  // },
+  ],
+  socialProviders: {
+    google: {
+      clientId: envConfig.GOOGLE_CLIENT_ID,
+      clientSecret: envConfig.GOOGLE_CLIENT_SECRET,
+      mapProfileToUser: (profile) => {
+        return {
+          name: profile.name,
+          emailVerified: true,
+          role: Role.PATIENT,
+          status: UserStatus.ACTIVE,
+          needPasswordChange: false,
+          isDeleted: false,
+          deletedAt: null
+        }
+      }
+    }
+  },
+  account: {
+    storeStateStrategy: 'cookie'
+  },
+  trustedOrigins: [envConfig.FRONTEND_URL],
+  advanced: {
+    useSecureCookies: envConfig.NODE_ENV === 'production',
+    cookies: {
+      state: {
+        attributes: {
+          sameSite: envConfig.NODE_ENV === 'production' ? 'none' : 'lax',
+          secure: envConfig.NODE_ENV === 'production',
+          httpOnly: true,
+          path: '/'
+        }
+      },
+      sessionToken: {
+        attributes: {
+          sameSite: envConfig.NODE_ENV === 'production' ? 'none' : 'lax',
+          secure: envConfig.NODE_ENV === 'production',
+          httpOnly: true,
+          path: '/'
+        }
+      }
+    }
+  }
 })
 
 export type AuthSession = typeof auth.$Infer.Session

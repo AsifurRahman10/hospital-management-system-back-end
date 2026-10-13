@@ -1,4 +1,4 @@
-import { Role } from '../../../../generated/prisma/client'
+import { Role, UserStatus } from '../../../../generated/prisma/client'
 import { auth } from '../../lib/auth'
 import { prisma } from '../../lib/prisma'
 import AppError from '../../shared/AppError'
@@ -101,8 +101,23 @@ const getMe = async (userId: string) => {
 const changePassword = async (
   oldPassword: string,
   newPassword: string,
-  headers: Headers
+  headers: Headers,
+  userId: string
 ) => {
+  const googleAccount = await prisma.account.findFirst({
+    where: {
+      userId,
+      providerId: 'google'
+    }
+  })
+
+  if (googleAccount) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Google accounts cannot change their password. Continue using Google to sign in.'
+    )
+  }
+
   const result = await auth.api.changePassword({
     body: {
       currentPassword: oldPassword,
@@ -112,7 +127,62 @@ const changePassword = async (
     headers: headers
   })
 
+  await prisma.user.updateMany({
+    where: {
+      id: userId,
+      needPasswordChange: true
+    },
+    data: {
+      needPasswordChange: false
+    }
+  })
+
   return result
+}
+
+const completeGoogleLogin = async (headers: Headers) => {
+  const sessionData = await auth.api.getSession({ headers })
+
+  if (!sessionData) {
+    throw new AppError(httpStatus.UNAUTHORIZED, 'Google authentication failed')
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { id: sessionData.user.id },
+    include: { accounts: true }
+  })
+
+  if (!user) {
+    throw new AppError(httpStatus.UNAUTHORIZED, 'User account was not found')
+  }
+
+  const googleAccount = user.accounts.some(
+    (account) => account.providerId === 'google'
+  )
+
+  if (!googleAccount || user.role !== Role.PATIENT) {
+    throw new AppError(
+      httpStatus.FORBIDDEN,
+      'Only patient accounts can sign in with Google'
+    )
+  }
+
+  const patient = await prisma.patient.upsert({
+    where: { userId: user.id },
+    create: {
+      userId: user.id,
+      name: user.name,
+      email: user.email,
+      profilePhoto: user.image
+    },
+    update: {
+      name: user.name,
+      email: user.email,
+      profilePhoto: user.image
+    }
+  })
+
+  return { user, patient }
 }
 
 const logout = async (headers: Headers) => {
@@ -144,11 +214,95 @@ const verifyEmail = async (email: string, otp: string) => {
   return true
 }
 
+const forgetPassword = async (email: string) => {
+  const isUserExist = await prisma.user.findUnique({
+    where: {
+      email
+    }
+  })
+
+  if (!isUserExist) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found')
+  }
+  if (!isUserExist.emailVerified) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Email is not verified')
+  }
+
+  return auth.api.requestPasswordResetEmailOTP({
+    body: {
+      email
+    }
+  })
+}
+
+const resetPassword = async (
+  email: string,
+  otp: string,
+  newPassword: string
+) => {
+  const isUserExist = await prisma.user.findUnique({
+    where: {
+      email
+    }
+  })
+  if (!isUserExist) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found')
+  }
+  if (!isUserExist.emailVerified) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Email is not verified')
+  }
+  if (isUserExist.isDeleted || isUserExist.status === UserStatus.DELETED) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'User is deleted')
+  }
+
+  const googleAccount = await prisma.account.findFirst({
+    where: {
+      userId: isUserExist.id,
+      providerId: 'google'
+    }
+  })
+
+  if (googleAccount) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Google accounts cannot reset their password. Continue using Google to sign in.'
+    )
+  }
+
+  await auth.api.resetPasswordEmailOTP({
+    body: {
+      email,
+      otp,
+      password: newPassword
+    }
+  })
+
+  if (isUserExist.needPasswordChange) {
+    await prisma.user.update({
+      where: {
+        email
+      },
+      data: {
+        needPasswordChange: false
+      }
+    })
+  }
+
+  await prisma.session.deleteMany({
+    where: {
+      userId: isUserExist.id
+    }
+  })
+}
+
 export const AuthServices = {
   registerPatient,
   loginUser,
   getMe,
   changePassword,
+  completeGoogleLogin,
   logout,
-  verifyEmail
+  verifyEmail,
+  forgetPassword,
+  resetPassword
 }
