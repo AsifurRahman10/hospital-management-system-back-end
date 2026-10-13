@@ -122,10 +122,33 @@ const logout = async (headers: Headers) => {
   })
 }
 
+const verifyEmail = async (email: string, otp: string) => {
+  const result = await auth.api.verifyEmailOTP({
+    body: {
+      email,
+      otp
+    }
+  })
+
+  if (result && !result.user.emailVerified) {
+    await prisma.user.update({
+      where: {
+        email
+      },
+      data: {
+        emailVerified: true
+      }
+    })
+  }
+
+  return true
+}
+
 export const AuthServices = {
   registerPatient,
   loginUser,
   getMe,
   changePassword,
-  logout
+  logout,
+  verifyEmail
 }
