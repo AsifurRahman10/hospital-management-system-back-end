@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0" />
+    <title>Verification Code</title>
+  </head>
+  <body
+    style="
+      margin: 0;
+      padding: 24px;
+      background: #f4f6f8;
+      font-family: Arial, sans-serif;
+      color: #202833;
+    ">
+    <div
+      style="
+        max-width: 400px;
+        margin: 0 auto;
+        padding: 32px;
+        background: #ffffff;
+        border: 1px solid #e3e7eb;
+        border-radius: 8px;
+      ">
+      <h2 style="margin-top: 0">Hello <%= name %>,</h2>
+      <p>Use the following code to verify your account.</p>
+
+      <div
+        style="
+          margin: 24px 0;
+          padding: 16px;
+          background: #f4f6f8;
+          border-radius: 6px;
+          text-align: center;
+        ">
+        <span style="font-size: 32px; font-weight: bold; letter-spacing: 8px"
+          ><%= otp %></span
+        >
+      </div>
+
+      <p style="color: #59636e; font-size: 14px; line-height: 1.6">
+        Your verification code will expire in <strong>2 minutes</strong>. Do not
+        share this code with anyone.
+      </p>
+    </div>
+  </body>
+</html>
