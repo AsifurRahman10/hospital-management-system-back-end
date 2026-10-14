@@ -5,6 +5,7 @@ import z from 'zod'
 import { envConfig } from '../config'
 import { Prisma } from '../../../generated/prisma/client'
 import AppError from '../shared/AppError'
+import { deleteImageFromCloudinary } from '../config/cloudinary.config'
 interface TErrorSource {
   path: string
   message: string
@@ -17,9 +18,9 @@ interface TErrorResponse {
   stack?: string
 }
 
-const globalErrorHandler = (
+const globalErrorHandler = async (
   err: unknown,
-  _req: Request,
+  req: Request,
   res: Response,
   _next: NextFunction
 ) => {
@@ -27,6 +28,14 @@ const globalErrorHandler = (
     console.error(err)
   }
 
+  if (req.file) {
+    await deleteImageFromCloudinary(req.file.path)
+  }
+
+  if (req.files && Array.isArray(req.files)) {
+    const urls = req.files.map((file: Express.Multer.File) => file.path)
+    await Promise.all(urls.map((url) => deleteImageFromCloudinary(url)))
+  }
   let statusCode: number = status.INTERNAL_SERVER_ERROR
   let message = 'Internal Server Error'
   let errorSource: TErrorSource[] = []
