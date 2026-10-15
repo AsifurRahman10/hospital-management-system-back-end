@@ -7,7 +7,8 @@ import { DoctorService } from './doctor.service'
 
 const getAllDoctors = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const data = await DoctorService.getAllDoctors()
+    const query = req.query
+    const data = await DoctorService.getAllDoctors(query)
 
     sendResponse(res, {
       statusCode: httpStatus.OK,

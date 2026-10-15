@@ -2,20 +2,92 @@ import { Gender } from '../../../../generated/prisma/enums'
 import { prisma } from '../../lib/prisma'
 import AppError from '../../shared/AppError'
 import httpStatus from 'http-status'
+import { QueryBuilder } from '../../utils/queryBuilder'
+import { IQueryParams } from '../../interface/query.interface'
+import { Doctor, Prisma } from '../../../../generated/prisma/client'
 
-const getAllDoctors = async () => {
-  const allDoctors = await prisma.doctor.findMany({
+export const doctorSearchableFields = [
+  'name',
+  'email',
+  'qualifications',
+  'designation',
+  'currentWorkplace',
+  'registrationNumber',
+  'doctorSpecialties.specialty.title'
+]
+
+export const doctorFilterableFields = [
+  'gender',
+  'isDeleted',
+  'appointmentFee',
+  'experience',
+  'registrationNumber',
+  'specialties.specialtyId',
+  'currentWorkplace',
+  'designation',
+  'qualification',
+  'doctorSpecialties.specialty.title',
+  'user.role'
+]
+
+export const doctorIncludeConfig: Partial<
+  Record<
+    keyof Prisma.DoctorInclude,
+    Prisma.DoctorInclude[keyof Prisma.DoctorInclude]
+  >
+> = {
+  user: true,
+  doctorSpecialties: {
     include: {
-      user: true,
-      doctorSpecialties: {
-        include: {
-          specialty: true
-        }
-      }
+      specialty: true
     }
+  },
+  appointments: {
+    include: {
+      patient: true,
+      doctor: true
+    }
+  },
+  doctorSchedules: {
+    include: {
+      schedule: true
+    }
+  },
+  prescriptions: true,
+  reviews: true
+}
+
+const getAllDoctors = async (query: IQueryParams) => {
+  // const allDoctors = await prisma.doctor.findMany({
+  //   include: {
+  //     user: true,
+  //     doctorSpecialties: {
+  //       include: {
+  //         specialty: true
+  //       }
+  //     }
+  //   }
+  // })
+  const queryBuilder = new QueryBuilder<
+    Doctor,
+    Prisma.DoctorWhereInput,
+    Prisma.DoctorInclude
+  >(prisma.doctor, query, {
+    searchableFields: doctorSearchableFields,
+    filterableFields: doctorFilterableFields
   })
 
-  return allDoctors
+  const result = await queryBuilder
+    .search()
+    .filter()
+    .where({ isDeleted: false })
+    .dynamicInclude(doctorIncludeConfig, ['user', 'doctorSpecialties'])
+    .paginate()
+    .sort()
+    .fields()
+    .execute()
+
+  return result
 }
 
 const getDoctorById = async (id: string) => {

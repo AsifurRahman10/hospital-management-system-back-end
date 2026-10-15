@@ -6,8 +6,11 @@ import globalErrorHandler from './app/middleware/globalErrorHandler'
 import notFound from './app/middleware/notFound'
 import cors from 'cors'
 import { envConfig } from './app/config'
+import qs from 'qs'
 
 const app: Application = express()
+
+app.set('query parser', (str: string) => qs.parse(str))
 
 app.use(
   cors({
