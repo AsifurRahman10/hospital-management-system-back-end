@@ -42,7 +42,6 @@ const loginUser = catchAsync(
 
 const getMe = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    console.log(req.user)
     const data = await AuthServices.getMe(req.user?.id as string)
 
     sendResponse(res, {

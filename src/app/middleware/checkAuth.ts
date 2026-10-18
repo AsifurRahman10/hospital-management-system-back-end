@@ -26,7 +26,6 @@ const checkAuth = (...allowedRoles: Role[]) => {
           email: betterAuthUser.email
         }
       })
-      console.log(user)
       if (!user) {
         return res.status(httpStatus.UNAUTHORIZED).json({
           success: false,

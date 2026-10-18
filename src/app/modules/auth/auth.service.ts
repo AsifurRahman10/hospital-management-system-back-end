@@ -69,7 +69,6 @@ const loginUser = async (payload: ILoginPatientPayload) => {
 }
 
 const getMe = async (userId: string) => {
-  console.log(userId)
   const isUserExist = await prisma.user.findUnique({
     where: { id: userId },
     include: {

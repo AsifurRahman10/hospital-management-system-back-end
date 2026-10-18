@@ -167,7 +167,6 @@ const updateOwnDoctorSchedule = async (
   const deleteIds = payload.scheduleIds
     .filter((schedule) => schedule.shouldDelete)
     .map((schedule) => schedule.id)
-  console.log(deleteIds)
   const createIds = payload.scheduleIds
     .filter((schedule) => !schedule.shouldDelete)
     .map((schedule) => schedule.id)
