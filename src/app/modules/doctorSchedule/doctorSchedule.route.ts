@@ -17,12 +17,12 @@ router.get(
 )
 router.get(
   '/',
-  //   checkAuth(Role.ADMIN, Role.SUPER_ADMIN),s
+  checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
   DoctorScheduleController.getAllDoctorSchedules
 )
 router.get(
   '/:doctorId/schedule/:scheduleId',
-  //   checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
+  checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
   DoctorScheduleController.getDoctorScheduleById
 )
 router.patch(

@@ -15,23 +15,23 @@ router.post(
 )
 router.get(
   '/',
-  //   checkAuth(Role.ADMIN, Role.SUPER_ADMIN, Role.DOCTOR),
+  checkAuth(Role.ADMIN, Role.SUPER_ADMIN, Role.DOCTOR),
   ScheduleController.getAllSchedules
 )
 router.get(
   '/:id',
-  //   checkAuth(Role.ADMIN, Role.SUPER_ADMIN, Role.DOCTOR),
+  checkAuth(Role.ADMIN, Role.SUPER_ADMIN, Role.DOCTOR),
   ScheduleController.getScheduleById
 )
 router.patch(
   '/:id',
-  //   checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
+  checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
   validateRequest(ScheduleValidation.updateScheduleZodSchema),
   ScheduleController.updateSchedule
 )
 router.delete(
   '/:id',
-  //   checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
+  checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
   ScheduleController.deleteSchedule
 )
 
