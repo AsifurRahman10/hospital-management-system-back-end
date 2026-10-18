@@ -26,7 +26,8 @@ const getAllSchedules = catchAsync(
       statusCode: httpStatus.OK,
       success: true,
       message: 'Doctors retrieved successfully',
-      data: data
+      data: data,
+      meta: data.meta
     })
   }
 )
