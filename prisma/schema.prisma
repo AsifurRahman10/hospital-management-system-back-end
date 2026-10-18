@@ -271,14 +271,15 @@ model SuperAdmin {
 }
 
 model Schedule {
-  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  startDate DateTime
-  endDate   DateTime
+  id        String   @id @default(uuid(7))
+  startDateTime       DateTime
+  endDateTime         DateTime
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   // Relations
   doctorSchedules DoctorSchedules[]
+  appointments    Appointment[]
 
   @@map("schedules")
 }
@@ -301,9 +302,9 @@ model DoctorSchedules {
 }
 
 model Appointment {
-  id                 String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  patientId          String   @db.Uuid
-  doctorId           String   @db.Uuid
+  id                 String   @id @default(uuid()) @db.Uuid
+  patientId          String
+  doctorId           String
   doctorScheduleId   String   @unique @db.Uuid
   videoCallingId     String
   status             AppointmentStatus @default(SCHEDULED)
@@ -321,12 +322,13 @@ model Appointment {
   @@map("appointments")
   prescriptions Prescription[]
   payments Payment[]
+  schedules Schedule[]
 }
 
 model Review {
   id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  patientId     String   @db.Uuid
-  doctorId      String   @db.Uuid
+  patientId     String
+  doctorId      String
   appointmentId String   @unique @db.Uuid
   rating        Float
   comment       String?
@@ -343,7 +345,7 @@ model Review {
 
 model PatientHealthData {
   id                  String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  patientId           String        @unique @db.Uuid
+  patientId           String        @unique
   gender              Gender
   dateOfBirth         DateTime
   bloodGroup          BloodGroup
@@ -372,8 +374,8 @@ model PatientHealthData {
 
 model MedicalReport {
   id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  patientId     String   @db.Uuid
-  doctorId      String   @db.Uuid
+  patientId     String
+  doctorId      String
   appointmentId String   @unique @db.Uuid
   diagnosis     String
   treatment     String
@@ -397,7 +399,7 @@ model Prescription {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  appointmentId String      @unique
+  appointmentId String      @unique @db.Uuid
   appointment   Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   patientId String
@@ -421,7 +423,7 @@ model Payment {
     createdAt          DateTime      @default(now())
     updatedAt          DateTime      @updatedAt
 
-    appointmentId String      @unique
+    appointmentId String      @unique @db.Uuid
     appointment   Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
 
     @@index([appointmentId])
