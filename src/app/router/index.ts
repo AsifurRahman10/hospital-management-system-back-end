@@ -7,6 +7,7 @@ import { AdminRoutes } from '../modules/admin/admin.route'
 import { SuperAdminRoutes } from '../modules/superAdmin/superAdmin.route'
 import { ScheduleRoutes } from '../modules/schedule/schedule.router'
 import { DoctorScheduleRoutes } from '../modules/doctorSchedule/doctorSchedule.route'
+import { AppointmentRoutes } from '../modules/appointment/appointment.router'
 
 export const router = Router()
 
@@ -42,6 +43,10 @@ const moduleRouter = [
   {
     path: '/doctorSchedule',
     route: DoctorScheduleRoutes
+  },
+  {
+    path: '/appointment',
+    route: AppointmentRoutes
   }
 ]
 
