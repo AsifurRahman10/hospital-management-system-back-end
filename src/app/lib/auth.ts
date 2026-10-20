@@ -54,11 +54,18 @@ export const auth = betterAuth({
       overrideDefaultEmailVerification: true,
       async sendVerificationOTP({ email, otp, type }) {
         if (type === 'email-verification') {
-          const user = await prisma.user.findUnique({
+          const user = await prisma.user.findUniqueOrThrow({
             where: {
               email
             }
           })
+
+          if (user && user.role === Role.SUPER_ADMIN) {
+            console.log(
+              `User with email ${email} is a super admin. Skipping sending verification OTP.`
+            )
+            return
+          }
 
           if (user && !user.emailVerified) {
             sendEmail({
