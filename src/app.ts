@@ -7,10 +7,19 @@ import notFound from './app/middleware/notFound'
 import cors from 'cors'
 import { envConfig } from './app/config'
 import qs from 'qs'
+import { PaymentController } from './app/modules/payment/payment.controller'
+import cron from 'node-cron'
+import { AppointmentService } from './app/modules/appointment/appointment.service'
 
 const app: Application = express()
 
 app.set('query parser', (str: string) => qs.parse(str))
+
+app.post(
+  '/webhook',
+  express.raw({ type: 'application/json' }),
+  PaymentController.handleStripeWebhookEvent
+)
 
 app.use(
   cors({
@@ -29,6 +38,15 @@ app.use(
 app.use(express.urlencoded({ extended: true }))
 
 app.all('/api/auth/*splat', toNodeHandler(auth))
+
+cron.schedule('*/25 * * * *', async () => {
+  try {
+    console.log(`Running corn job to cancel appointment`)
+    await AppointmentService.cancelUnpaidAppointment()
+  } catch (error) {
+    console.log(error)
+  }
+})
 
 // Middleware to parse JSON bodies
 app.use(express.json())

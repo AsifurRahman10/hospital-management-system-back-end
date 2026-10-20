@@ -24,8 +24,6 @@ enum PaymentStatus {
   UNPAID
 }
 
-
-
 enum BloodGroup {
   A_POSITIVE
   A_NEGATIVE
@@ -54,47 +52,47 @@ model Specialty {
   createdAt DateTime @default(now())
   updateAt  DateTime @updatedAt
 
-  isDeleted Boolean   @default(false)
-  deletedAt DateTime?
+  isDeleted         Boolean           @default(false)
+  deletedAt         DateTime?
+  doctorSpecialties DoctorSpecialty[]
 
   @@index([isDeleted], name: "idx_specialty_isDeleted")
   @@index([title], name: "idx_specialty_title")
   @@map("specialties")
-  doctorSpecialties DoctorSpecialty[]
 }
 
-enum Role{
+enum Role {
   SUPER_ADMIN
   ADMIN
   PATIENT
   DOCTOR
 }
 
-enum UserStatus{
+enum UserStatus {
   BLOCK
   DELETED
   ACTIVE
 }
 
 model User {
-  id            String    @id
-  name          String
-  email         String
-  emailVerified Boolean   @default(false)
-  image         String?
-  role          Role  @default(PATIENT)
-  status        UserStatus @default(ACTIVE)
-  needPasswordChange Boolean @default(false)
-  isDeleted Boolean @default(false)
-  deletedAt DateTime?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  sessions      Session[]
-  accounts      Account[]
-  patient     Patient?
-  doctor      Doctor?
-  admin       Admin?
-  superAdmin  SuperAdmin?
+  id                 String      @id
+  name               String
+  email              String
+  emailVerified      Boolean     @default(false)
+  image              String?
+  role               Role        @default(PATIENT)
+  status             UserStatus  @default(ACTIVE)
+  needPasswordChange Boolean     @default(false)
+  isDeleted          Boolean     @default(false)
+  deletedAt          DateTime?
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
+  sessions           Session[]
+  accounts           Account[]
+  patient            Patient?
+  doctor             Doctor?
+  admin              Admin?
+  superAdmin         SuperAdmin?
 
   @@unique([email])
   @@map("user")
@@ -148,18 +146,17 @@ model Verification {
   @@map("verification")
 }
 
-model Patient{
-  id String @id @default(uuid(7))
-  name String @db.VarChar(100)
-  email String @db.VarChar(100) @unique
-  profilePhoto String? 
+model Patient {
+  id            String    @id @default(uuid(7))
+  name          String    @db.VarChar(100)
+  email         String    @unique @db.VarChar(100)
+  profilePhoto  String?
   contactNumber String?
-  address String?
-  isDeleted Boolean @default(false)
-  deletedAt DateTime?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
+  address       String?
+  isDeleted     Boolean   @default(false)
+  deletedAt     DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   patientHealthData PatientHealthData?
   appointments      Appointment[]
@@ -168,60 +165,60 @@ model Patient{
 
   // relation
   userId String @unique
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   prescriptions Prescription[]
 }
 
-enum Gender{
+enum Gender {
   MALE
   FEMALE
   OTHER
 }
 
-model Doctor{
-  id String @id @default(uuid(7))
-  name String 
-  email String @unique
-  profilePhoto String? 
+model Doctor {
+  id            String    @id @default(uuid(7))
+  name          String
+  email         String    @unique
+  profilePhoto  String?
   contactNumber String?
-  address String?
-  isDeleted Boolean @default(false)
-  deletedAt DateTime?
+  address       String?
+  isDeleted     Boolean   @default(false)
+  deletedAt     DateTime?
 
-  registrationNumber String? @unique
-  experience Int?
-  gender Gender
-  appointmentFee Float?
-  qualifications String?
-  currentWorkplace String?
-  designation String?
-  averageRating Float? @default(0.0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  registrationNumber String?  @unique
+  experience         Int?
+  gender             Gender
+  appointmentFee     Float?
+  qualifications     String?
+  currentWorkplace   String?
+  designation        String?
+  averageRating      Float?   @default(0.0)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 
   // relation
-  userId String @unique
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  @@index([email], name: "idx_doctor_email")
-  @@index([isDeleted], name: "idx_doctor_isDeleted")
-
-  @@map("doctor")
+  userId            String            @unique
+  user              User              @relation(fields: [userId], references: [id], onDelete: Cascade)
   doctorSpecialties DoctorSpecialty[]
-  doctorSchedules DoctorSchedules[]
-   appointments      Appointment[]
+  doctorSchedules   DoctorSchedules[]
+  appointments      Appointment[]
   reviews           Review[]
   medicalReports    MedicalReport[]
-  prescriptions Prescription[]
+  prescriptions     Prescription[]
+
+  @@index([email], name: "idx_doctor_email")
+  @@index([isDeleted], name: "idx_doctor_isDeleted")
+  @@map("doctor")
 }
 
-model DoctorSpecialty{
-  id String @id @default(uuid(7))
-  doctorId String
+model DoctorSpecialty {
+  id          String @id @default(uuid(7))
+  doctorId    String
   specialtyId String
 
   // relation
-  doctor Doctor @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  doctor    Doctor    @relation(fields: [doctorId], references: [id], onDelete: Cascade)
   specialty Specialty @relation(fields: [specialtyId], references: [id], onDelete: Cascade)
 
   @@unique([doctorId, specialtyId])
@@ -231,19 +228,19 @@ model DoctorSpecialty{
 }
 
 model Admin {
-  id String @id @default(uuid(7))
-  name String @db.VarChar(100)
-  email String @db.VarChar(100) @unique
-  profilePhoto String?
+  id            String    @id @default(uuid(7))
+  name          String    @db.VarChar(100)
+  email         String    @unique @db.VarChar(100)
+  profilePhoto  String?
   contactNumber String?
-  isDeleted Boolean @default(false)
-  deletedAt DateTime?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  isDeleted     Boolean   @default(false)
+  deletedAt     DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   // relation
   userId String @unique
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([email], name: "idx_admin_email")
   @@index([isDeleted], name: "idx_admin_isDeleted")
@@ -251,19 +248,19 @@ model Admin {
 }
 
 model SuperAdmin {
-  id String @id @default(uuid(7))
-  name String @db.VarChar(100)
-  email String @db.VarChar(100) @unique
-  profilePhoto String?
+  id            String    @id @default(uuid(7))
+  name          String    @db.VarChar(100)
+  email         String    @unique @db.VarChar(100)
+  profilePhoto  String?
   contactNumber String?
-  isDeleted Boolean @default(false)
-  deletedAt DateTime?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  isDeleted     Boolean   @default(false)
+  deletedAt     DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   // relation
   userId String @unique
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([email], name: "idx_super_admin_email")
   @@index([isDeleted], name: "idx_super_admin_isDeleted")
@@ -271,11 +268,11 @@ model SuperAdmin {
 }
 
 model Schedule {
-  id        String   @id @default(uuid(7))
-  startDateTime       DateTime
-  endDateTime         DateTime
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            String   @id @default(uuid(7))
+  startDateTime DateTime
+  endDateTime   DateTime
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   // Relations
   doctorSchedules DoctorSchedules[]
@@ -302,27 +299,26 @@ model DoctorSchedules {
 }
 
 model Appointment {
-  id                 String   @id @default(uuid()) @db.Uuid
-  patientId          String
-  doctorId           String
-  doctorScheduleId   String   @unique @db.Uuid
-  videoCallingId     String   @db.Uuid @unique
-  status             AppointmentStatus @default(SCHEDULED)
-  paymentStatus      PaymentStatus @default(UNPAID)
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
+  id               String            @id @default(uuid()) @db.Uuid
+  patientId        String
+  doctorId         String
+  doctorScheduleId String            @unique @db.Uuid
+  videoCallingId   String            @unique @db.Uuid
+  status           AppointmentStatus @default(SCHEDULED)
+  paymentStatus    PaymentStatus     @default(UNPAID)
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
 
   // Relations
-  patient        Patient         @relation(fields: [patientId], references: [id])
-  doctor         Doctor          @relation(fields: [doctorId], references: [id])
-  review          Review?
-  // prescription    Prescription?
-  medicalReport   MedicalReport?
+  patient       Patient        @relation(fields: [patientId], references: [id])
+  doctor        Doctor         @relation(fields: [doctorId], references: [id])
+  review        Review?
+  prescription  Prescription?
+  medicalReport MedicalReport?
+  payment       Payment?
+  schedules     Schedule[]
 
   @@map("appointments")
-  prescriptions Prescription[]
-  payments Payment[]
-  schedules Schedule[]
 }
 
 model Review {
@@ -371,17 +367,16 @@ model PatientHealthData {
   @@map("patient_health_data")
 }
 
-
 model MedicalReport {
-  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   patientId     String
   doctorId      String
-  appointmentId String   @unique @db.Uuid
+  appointmentId String    @unique @db.Uuid
   diagnosis     String
   treatment     String
   followUpDate  DateTime?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   // Relations
   patient     Patient     @relation(fields: [patientId], references: [id])
@@ -390,7 +385,6 @@ model MedicalReport {
 
   @@map("medical_reports")
 }
-
 
 model Prescription {
   id           String   @id @default(uuid(7))
@@ -415,19 +409,19 @@ model Prescription {
 }
 
 model Payment {
-    id                 String        @id @default(uuid(7))
-    amount             Float
-    transactionId      String        @db.Uuid @unique
-    stripeEventId      String        @db.Uuid @unique
-    status             PaymentStatus @default(UNPAID)
-    paymentGatewayData Json?
-    createdAt          DateTime      @default(now())
-    updatedAt          DateTime      @updatedAt
+  id                 String        @id @default(uuid(7))
+  amount             Float
+  transactionId      String        @unique @db.Uuid
+  stripeEventId      String?       @unique @db.Uuid
+  status             PaymentStatus @default(UNPAID)
+  paymentGatewayData Json?
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
 
-    appointmentId String      @unique @db.Uuid
-    appointment   Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  appointmentId String      @unique @db.Uuid
+  appointment   Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
 
-    @@index([appointmentId])
-    @@index([transactionId])
-    @@map("payments")
+  @@index([appointmentId])
+  @@index([transactionId])
+  @@map("payments")
 }

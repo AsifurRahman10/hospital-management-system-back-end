@@ -30,15 +30,15 @@ router.get(
   checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
   AppointmentController.getAllAppointments
 )
-// router.post(
-//   '/book-appointment-with-pay-later',
-//   checkAuth(Role.PATIENT),
-//   AppointmentController.bookAppointmentWithPayLater
-// )
-// router.post(
-//   '/initiate-payment/:id',
-//   checkAuth(Role.PATIENT),
-//   AppointmentController.initiatePayment
-// )
+router.post(
+  '/book-appointment-with-pay-later',
+  checkAuth(Role.PATIENT),
+  AppointmentController.bookAppointmentWithPayLater
+)
+router.post(
+  '/initiate-payment/:id',
+  checkAuth(Role.PATIENT),
+  AppointmentController.initiatePayment
+)
 
 export const AppointmentRoutes = router
