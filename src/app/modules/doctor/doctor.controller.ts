@@ -4,6 +4,7 @@ import catchAsync from '../../shared/catchAsync'
 import sendResponse from '../../shared/sendResponse'
 import httpStatus from 'http-status'
 import { DoctorService } from './doctor.service'
+import { IUser } from '../../interface'
 
 const getAllDoctors = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -64,9 +65,24 @@ const deleteDoctor = catchAsync(
   }
 )
 
+const updateMyProfile = catchAsync(async (req: Request, res: Response) => {
+  const user = req.user as IUser
+  const payload = req.body
+
+  const result = await DoctorService.updateMyProfile(user, payload)
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: 'Profile updated successfully',
+    data: result
+  })
+})
+
 export const DoctorController = {
   getAllDoctors,
   getDoctorById,
   updateDoctor,
-  deleteDoctor
+  deleteDoctor,
+  updateMyProfile
 }
