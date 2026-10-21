@@ -1,5 +1,6 @@
 import { Gender } from '../../../../generated/prisma/enums'
 import { prisma } from '../../lib/prisma'
+import { IUser } from '../../interface'
 import AppError from '../../shared/AppError'
 import httpStatus from 'http-status'
 import { QueryBuilder } from '../../utils/queryBuilder'
@@ -202,6 +203,145 @@ const updateDoctor = async (payload: UpdateDoctorPayload) => {
   return updatedDoctor
 }
 
+export interface IUpdateDoctorInfoPayload {
+  name?: string
+  profilePhoto?: string
+  contactNumber?: string
+  address?: string
+  registrationNumber?: string
+  experience?: number
+  gender?: Gender
+  appointmentFee?: number
+  qualifications?: string
+  currentWorkplace?: string
+  designation?: string
+}
+
+export interface IUpdateDoctorSpecialtyPayload {
+  specialtyId: string
+  shouldDelete?: boolean
+}
+
+export interface IUpdateDoctorProfilePayload {
+  doctorInfo?: IUpdateDoctorInfoPayload
+  specialties?: IUpdateDoctorSpecialtyPayload[]
+}
+
+const updateMyProfile = async (
+  user: IUser,
+  payload: IUpdateDoctorProfilePayload
+) => {
+  const doctorData = await prisma.doctor.findUniqueOrThrow({
+    where: {
+      email: user.email
+    }
+  })
+
+  if (payload.specialties && payload.specialties.length > 0) {
+    const specialtyIds = [
+      ...new Set(payload.specialties.map((item) => item.specialtyId))
+    ]
+
+    const existingSpecialties = await prisma.specialty.findMany({
+      where: {
+        id: {
+          in: specialtyIds
+        },
+        isDeleted: false
+      },
+      select: {
+        id: true
+      }
+    })
+
+    if (existingSpecialties.length !== specialtyIds.length) {
+      throw new AppError(
+        httpStatus.NOT_FOUND,
+        'One or more specialties not found'
+      )
+    }
+  }
+
+  const updatedDoctor = await prisma.$transaction(async (tx) => {
+    if (payload.doctorInfo) {
+      await tx.doctor.update({
+        where: {
+          id: doctorData.id
+        },
+        data: {
+          ...payload.doctorInfo
+        }
+      })
+    }
+
+    if (payload?.doctorInfo?.name || payload?.doctorInfo?.profilePhoto) {
+      const userData = {
+        name: payload.doctorInfo.name
+          ? payload.doctorInfo.name
+          : doctorData.name,
+        image: payload.doctorInfo.profilePhoto
+          ? payload.doctorInfo.profilePhoto
+          : doctorData.profilePhoto
+      }
+      await tx.user.update({
+        where: {
+          id: doctorData.userId
+        },
+        data: {
+          ...userData
+        }
+      })
+    }
+
+    if (
+      payload.specialties &&
+      Array.isArray(payload.specialties) &&
+      payload.specialties.length > 0
+    ) {
+      for (const specialty of payload.specialties) {
+        if (specialty.shouldDelete) {
+          await tx.doctorSpecialty.deleteMany({
+            where: {
+              doctorId: doctorData.id,
+              specialtyId: specialty.specialtyId
+            }
+          })
+        } else {
+          await tx.doctorSpecialty.upsert({
+            where: {
+              doctorId_specialtyId: {
+                doctorId: doctorData.id,
+                specialtyId: specialty.specialtyId
+              }
+            },
+            update: {},
+            create: {
+              doctorId: doctorData.id,
+              specialtyId: specialty.specialtyId
+            }
+          })
+        }
+      }
+    }
+
+    return tx.doctor.findUniqueOrThrow({
+      where: {
+        id: doctorData.id
+      },
+      include: {
+        user: true,
+        doctorSpecialties: {
+          include: {
+            specialty: true
+          }
+        }
+      }
+    })
+  })
+
+  return updatedDoctor
+}
+
 const deleteDoctor = async (id: string) => {
   const existingDoctor = await prisma.doctor.findFirst({
     where: {
@@ -229,5 +369,6 @@ export const DoctorService = {
   getAllDoctors,
   getDoctorById,
   updateDoctor,
+  updateMyProfile,
   deleteDoctor
 }
