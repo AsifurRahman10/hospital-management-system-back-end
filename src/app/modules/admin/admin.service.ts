@@ -1,4 +1,5 @@
 import { prisma } from '../../lib/prisma'
+import { IUser } from '../../interface'
 import AppError from '../../shared/AppError'
 import httpStatus from 'http-status'
 
@@ -62,6 +63,68 @@ const updateAdmin = async (payload: UpdateAdminPayload) => {
   return updatedAdmin
 }
 
+export interface IUpdateAdminInfoPayload {
+  name?: string
+  profilePhoto?: string
+  contactNumber?: string
+}
+
+export interface IUpdateAdminProfilePayload {
+  adminInfo?: IUpdateAdminInfoPayload
+}
+
+const updateMyProfile = async (
+  user: IUser,
+  payload: IUpdateAdminProfilePayload
+) => {
+  const adminData = await prisma.admin.findUniqueOrThrow({
+    where: {
+      email: user.email
+    }
+  })
+
+  const updatedAdmin = await prisma.$transaction(async (tx) => {
+    if (payload.adminInfo) {
+      await tx.admin.update({
+        where: {
+          id: adminData.id
+        },
+        data: {
+          ...payload.adminInfo
+        }
+      })
+    }
+
+    if (payload?.adminInfo?.name || payload?.adminInfo?.profilePhoto) {
+      const userData = {
+        name: payload.adminInfo.name ? payload.adminInfo.name : adminData.name,
+        image: payload.adminInfo.profilePhoto
+          ? payload.adminInfo.profilePhoto
+          : adminData.profilePhoto
+      }
+      await tx.user.update({
+        where: {
+          id: adminData.userId
+        },
+        data: {
+          ...userData
+        }
+      })
+    }
+
+    return tx.admin.findUniqueOrThrow({
+      where: {
+        id: adminData.id
+      },
+      include: {
+        user: true
+      }
+    })
+  })
+
+  return updatedAdmin
+}
+
 const deleteAdmin = async (id: string, userId: string) => {
   const existingAdmin = await prisma.admin.findFirst({
     where: {
@@ -96,5 +159,6 @@ export const AdminService = {
   getAllAdmins,
   getAdminById,
   updateAdmin,
+  updateMyProfile,
   deleteAdmin
 }

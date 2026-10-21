@@ -5,6 +5,7 @@ import sendResponse from '../../shared/sendResponse'
 import httpStatus from 'http-status'
 import { AdminService } from './admin.service'
 import { fromNodeHeaders } from 'better-auth/node'
+import { IUser } from '../../interface'
 
 const getAllAdmins = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -64,9 +65,24 @@ const deleteAdmin = catchAsync(
   }
 )
 
+const updateMyProfile = catchAsync(async (req: Request, res: Response) => {
+  const user = req.user as IUser
+  const payload = req.body
+
+  const result = await AdminService.updateMyProfile(user, payload)
+
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: 'Profile updated successfully',
+    data: result
+  })
+})
+
 export const AdminController = {
   getAllAdmins,
   getAdminById,
   updateAdmin,
+  updateMyProfile,
   deleteAdmin
 }
