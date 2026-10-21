@@ -6,6 +6,7 @@ import { envConfig } from '../config'
 import { Prisma } from '../../../generated/prisma/client'
 import AppError from '../shared/AppError'
 import { deleteImageFromCloudinary } from '../config/cloudinary.config'
+import { deleteUploadedFilesFromGlobalErrorHandler } from '../utils/deleteUploadedFilesFromGlobalErrorHandler'
 interface TErrorSource {
   path: string
   message: string
@@ -28,14 +29,7 @@ const globalErrorHandler = async (
     console.error(err)
   }
 
-  if (req.file) {
-    await deleteImageFromCloudinary(req.file.path)
-  }
-
-  if (req.files && Array.isArray(req.files)) {
-    const urls = req.files.map((file: Express.Multer.File) => file.path)
-    await Promise.all(urls.map((url) => deleteImageFromCloudinary(url)))
-  }
+  await deleteUploadedFilesFromGlobalErrorHandler(req)
   let statusCode: number = status.INTERNAL_SERVER_ERROR
   let message = 'Internal Server Error'
   let errorSource: TErrorSource[] = []

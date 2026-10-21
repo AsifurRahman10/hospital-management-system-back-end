@@ -203,7 +203,6 @@ model Doctor {
   doctorSchedules   DoctorSchedules[]
   appointments      Appointment[]
   reviews           Review[]
-  medicalReports    MedicalReport[]
   prescriptions     Prescription[]
 
   @@index([email], name: "idx_doctor_email")
@@ -295,7 +294,6 @@ model Appointment {
   doctor        Doctor         @relation(fields: [doctorId], references: [id])
   review        Review?
   prescription  Prescription?
-  medicalReport MedicalReport?
   payment       Payment?
   schedules     Schedule[]
 
@@ -349,23 +347,19 @@ model PatientHealthData {
 }
 
 model MedicalReport {
-  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  patientId     String
-  doctorId      String
-  appointmentId String    @unique @db.Uuid
-  diagnosis     String
-  treatment     String
-  followUpDate  DateTime?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id         String   @id @default(uuid(7))
+  reportName String
+  reportLink String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
-  // Relations
-  patient     Patient     @relation(fields: [patientId], references: [id])
-  doctor      Doctor      @relation(fields: [doctorId], references: [id])
-  appointment Appointment @relation(fields: [appointmentId], references: [id])
+  patientId String
+  patient   Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
 
+  @@index([patientId])
   @@map("medical_reports")
 }
+
 
 model Prescription {
   id           String   @id @default(uuid(7))
