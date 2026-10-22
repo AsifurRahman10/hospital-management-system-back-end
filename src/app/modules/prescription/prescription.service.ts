@@ -47,7 +47,6 @@ const givePrescription = async (
       schedule: true
     }
   })
-  console.log(appointmentData)
   if (appointmentData.doctorId !== doctorData.id) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
