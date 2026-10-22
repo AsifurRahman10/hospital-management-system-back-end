@@ -1,0 +1,182 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Payment Confirmation & Invoice</title>
+</head>
+
+<body style="margin:0; padding:0; background-color:#f4f7fb; font-family:Arial,Helvetica,sans-serif; color:#1e293b;">
+
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+    style="background-color:#f4f7fb; padding:32px 12px;">
+    <tr>
+      <td align="center">
+
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+          style="max-width:600px; background-color:#ffffff; border-radius:16px; overflow:hidden;">
+
+          <!-- Header -->
+          <tr>
+            <td style="background-color:#155eef; padding:28px 32px; text-align:left;">
+              <p style="margin:0 0 8px; color:#dbeafe; font-size:12px; font-weight:bold; letter-spacing:1.5px;">
+                HEALTHCARE
+              </p>
+              <h1 style="margin:0; color:#ffffff; font-size:25px; line-height:1.4;">
+                Payment confirmed!
+              </h1>
+              <p style="margin:8px 0 0; color:#eaf2ff; font-size:14px; line-height:1.6;">
+                Your appointment payment was successful.
+              </p>
+            </td>
+          </tr>
+
+          <!-- Main content -->
+          <tr>
+            <td style="padding:32px;">
+
+              <p style="margin:0 0 12px; font-size:16px; line-height:1.6;">
+                Hello <strong><%= patientName %></strong>,
+              </p>
+
+              <p style="margin:0 0 24px; color:#64748b; font-size:14px; line-height:1.8;">
+                Thank you for your payment. Your transaction has been recorded,
+                and your invoice is ready for your records.
+              </p>
+
+              <!-- Success badge -->
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0"
+                style="margin-bottom:24px;">
+                <tr>
+                  <td style="background-color:#ecfdf3; border:1px solid #abefc6; border-radius:20px; padding:8px 14px;">
+                    <span style="color:#027a48; font-size:12px; font-weight:bold;">
+                      &#10003; PAYMENT SUCCESSFUL
+                    </span>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Amount card -->
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+                style="background-color:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; margin-bottom:28px;">
+                <tr>
+                  <td style="padding:22px 24px;">
+                    <p style="margin:0 0 8px; color:#64748b; font-size:13px;">
+                      Total amount paid
+                    </p>
+                    <p style="margin:0; color:#155eef; font-size:32px; font-weight:bold;">
+                      &#2547;<%= Number(amount || 0).toLocaleString("en-BD") %>
+                    </p>
+                    <p style="margin:12px 0 0; color:#64748b; font-size:12px;">
+                      Invoice ID:
+                      <strong style="color:#334155;"><%= invoiceId %></strong>
+                    </p>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Appointment details -->
+              <h2 style="margin:0 0 16px; font-size:17px; color:#0f172a;">
+                Appointment details
+              </h2>
+
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+                style="border:1px solid #e2e8f0; border-radius:10px;">
+
+                <tr>
+                  <td style="padding:14px 16px; border-bottom:1px solid #e2e8f0; color:#64748b; font-size:13px; width:40%;">
+                    Patient
+                  </td>
+                  <td style="padding:14px 16px; border-bottom:1px solid #e2e8f0; color:#0f172a; font-size:13px; font-weight:bold;">
+                    <%= patientName %>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td style="padding:14px 16px; border-bottom:1px solid #e2e8f0; color:#64748b; font-size:13px;">
+                    Doctor
+                  </td>
+                  <td style="padding:14px 16px; border-bottom:1px solid #e2e8f0; color:#0f172a; font-size:13px; font-weight:bold;">
+                    Dr. <%= doctorName %>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td style="padding:14px 16px; border-bottom:1px solid #e2e8f0; color:#64748b; font-size:13px;">
+                    Appointment date
+                  </td>
+                  <td style="padding:14px 16px; border-bottom:1px solid #e2e8f0; color:#0f172a; font-size:13px;">
+                    <%= appointmentDate %>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td style="padding:14px 16px; border-bottom:1px solid #e2e8f0; color:#64748b; font-size:13px;">
+                    Payment date
+                  </td>
+                  <td style="padding:14px 16px; border-bottom:1px solid #e2e8f0; color:#0f172a; font-size:13px;">
+                    <%= paymentDate %>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td style="padding:14px 16px; color:#64748b; font-size:13px;">
+                    Transaction ID
+                  </td>
+                  <td style="padding:14px 16px; color:#0f172a; font-size:13px; font-weight:bold; word-break:break-word;">
+                    <%= transactionId || "Not available" %>
+                  </td>
+                </tr>
+
+              </table>
+
+              <!-- Invoice action -->
+              <% if (invoiceUrl) { %>
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+                  style="margin-top:28px;">
+                  <tr>
+                    <td align="center">
+                      <a href="<%= invoiceUrl %>"
+                        style="display:inline-block; background-color:#155eef; color:#ffffff; text-decoration:none; font-size:14px; font-weight:bold; padding:14px 28px; border-radius:8px;">
+                        View Your Invoice
+                      </a>
+                    </td>
+                  </tr>
+                </table>
+              <% } %>
+
+              <p style="margin:24px 0 0; color:#64748b; font-size:13px; line-height:1.8;">
+                A PDF copy of your invoice is attached to this email for your convenience.
+                Please keep it for your records.
+              </p>
+
+              <p style="margin:20px 0 0; color:#334155; font-size:14px; line-height:1.7;">
+                Thank you for choosing our healthcare service.
+                We wish you good health and a speedy recovery.
+              </p>
+
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="padding:24px 32px; background-color:#f8fafc; border-top:1px solid #e2e8f0; text-align:center;">
+              <p style="margin:0 0 8px; color:#334155; font-size:13px; font-weight:bold;">
+                Healthcare Management System
+              </p>
+              <p style="margin:0; color:#94a3b8; font-size:12px; line-height:1.8;">
+                This is an automated payment confirmation email.<br />
+                If you have questions about your payment, please contact support.
+              </p>
+            </td>
+          </tr>
+
+        </table>
+
+      </td>
+    </tr>
+  </table>
+
+</body>
+</html>
