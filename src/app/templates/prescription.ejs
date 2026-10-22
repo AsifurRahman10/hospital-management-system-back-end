@@ -1,0 +1,201 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Your New Prescription</title>
+</head>
+
+<body style="margin:0; padding:0; background-color:#f3f6fb; font-family:Arial,Helvetica,sans-serif; color:#172b4d;">
+
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+    style="background-color:#f3f6fb; padding:32px 12px;">
+    <tr>
+      <td align="center">
+
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+          style="max-width:600px; background-color:#ffffff; border-radius:16px; overflow:hidden;">
+
+          <!-- Header -->
+          <tr>
+            <td style="background-color:#155eef; padding:28px 32px;">
+              <p style="margin:0 0 8px; color:#dbeafe; font-size:12px; font-weight:bold; letter-spacing:1.5px;">
+                PH HEALTHCARE
+              </p>
+              <h1 style="margin:0; color:#ffffff; font-size:25px; line-height:1.4;">
+                Your prescription is ready
+              </h1>
+              <p style="margin:8px 0 0; color:#eaf2ff; font-size:14px; line-height:1.7;">
+                Your doctor has issued a new prescription for you.
+              </p>
+            </td>
+          </tr>
+
+          <!-- Main content -->
+          <tr>
+            <td style="padding:32px;">
+
+              <p style="margin:0 0 12px; font-size:16px; line-height:1.6;">
+                Hello <strong><%= patientName %></strong>,
+              </p>
+
+              <p style="margin:0 0 24px; color:#667085; font-size:14px; line-height:1.8;">
+                Your consultation is an important step in your healthcare journey.
+                Your doctor has prepared a prescription for you. You can review
+                the attached PDF or use the link below to access it.
+              </p>
+
+              <!-- Status badge -->
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0"
+                style="margin-bottom:24px;">
+                <tr>
+                  <td style="background-color:#ecfdf3; border:1px solid #abefc6; border-radius:20px; padding:8px 14px;">
+                    <span style="color:#027a48; font-size:12px; font-weight:bold;">
+                      &#10003; PRESCRIPTION ISSUED
+                    </span>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Doctor information -->
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+                style="background-color:#f8fafc; border:1px solid #e4e7ec; border-radius:12px; margin-bottom:24px;">
+                <tr>
+                  <td style="padding:20px 22px;">
+                    <p style="margin:0 0 14px; color:#667085; font-size:11px; font-weight:bold; letter-spacing:1px;">
+                      PRESCRIBING DOCTOR
+                    </p>
+                    <p style="margin:0 0 7px; color:#172b4d; font-size:18px; font-weight:bold;">
+                      Dr. <%= doctorName %>
+                    </p>
+                    <% if (specialization) { %>
+                      <p style="margin:0 0 14px; color:#667085; font-size:13px; line-height:1.6;">
+                        <%= specialization %>
+                      </p>
+                    <% } %>
+                    <p style="margin:0; color:#667085; font-size:12px;">
+                      Appointment date:
+                      <strong style="color:#344054;"><%= appointmentDate %></strong>
+                    </p>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Prescription details -->
+              <h2 style="margin:0 0 16px; color:#172b4d; font-size:17px;">
+                Prescription details
+              </h2>
+
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+                style="border:1px solid #e4e7ec; border-radius:10px;">
+
+                <tr>
+                  <td style="width:42%; padding:14px 16px; border-bottom:1px solid #e4e7ec; color:#667085; font-size:13px;">
+                    Prescription ID
+                  </td>
+                  <td style="padding:14px 16px; border-bottom:1px solid #e4e7ec; color:#172b4d; font-size:13px; font-weight:bold; word-break:break-word;">
+                    <%= prescriptionId %>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td style="padding:14px 16px; border-bottom:1px solid #e4e7ec; color:#667085; font-size:13px;">
+                    Issued date
+                  </td>
+                  <td style="padding:14px 16px; border-bottom:1px solid #e4e7ec; color:#172b4d; font-size:13px;">
+                    <%= issuedDate %>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td style="padding:14px 16px; color:#667085; font-size:13px;">
+                    Follow-up date
+                  </td>
+                  <td style="padding:14px 16px; color:#172b4d; font-size:13px; font-weight:bold;">
+                    <%= followUpDate || "As advised by your doctor" %>
+                  </td>
+                </tr>
+
+              </table>
+
+              <!-- Doctor's instructions -->
+              <% if (instructions) { %>
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+                  style="margin-top:24px; background-color:#eff6ff; border-left:4px solid #155eef; border-radius:6px;">
+                  <tr>
+                    <td style="padding:18px 20px;">
+                      <h2 style="margin:0 0 10px; color:#1d4ed8; font-size:15px;">
+                        Your doctor's instructions
+                      </h2>
+                      <p style="margin:0; color:#344054; font-size:13px; line-height:1.8; white-space:pre-line; overflow-wrap:anywhere;"><%= instructions %></p>
+                    </td>
+                  </tr>
+                </table>
+              <% } %>
+
+              <!-- PDF action -->
+              <% if (pdfUrl) { %>
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+                  style="margin-top:28px;">
+                  <tr>
+                    <td align="center">
+                      <a href="<%= pdfUrl %>"
+                        style="display:inline-block; background-color:#155eef; color:#ffffff; text-decoration:none; font-size:14px; font-weight:bold; padding:15px 28px; border-radius:8px;">
+                        View Prescription PDF
+                      </a>
+                    </td>
+                  </tr>
+                </table>
+              <% } %>
+
+              <p style="margin:18px 0 0; color:#667085; font-size:12px; line-height:1.8; text-align:center;">
+                A PDF copy of your prescription is also attached to this email.
+              </p>
+
+              <!-- Safety note -->
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+                style="margin-top:26px; border-top:1px solid #e4e7ec;">
+                <tr>
+                  <td style="padding-top:20px;">
+                    <p style="margin:0 0 7px; color:#344054; font-size:12px; font-weight:bold;">
+                      Important health reminder
+                    </p>
+                    <p style="margin:0; color:#667085; font-size:12px; line-height:1.8;">
+                      Follow your doctor's directions and consult your healthcare
+                      provider if you have questions about your prescription.
+                      Do not change your prescribed treatment without medical advice.
+                    </p>
+                  </td>
+                </tr>
+              </table>
+
+              <p style="margin:24px 0 0; color:#344054; font-size:14px; line-height:1.7;">
+                Take care of your health,<br />
+                <strong>PH Healthcare Team</strong>
+              </p>
+
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="padding:24px 32px; background-color:#f8fafc; border-top:1px solid #e4e7ec; text-align:center;">
+              <p style="margin:0 0 8px; color:#344054; font-size:13px; font-weight:bold;">
+                PH Healthcare Services
+              </p>
+              <p style="margin:0; color:#98a2b3; font-size:11px; line-height:1.8;">
+                This is an automated notification containing private health information.<br />
+                Please do not forward it to anyone who is not authorized to view it.
+              </p>
+            </td>
+          </tr>
+
+        </table>
+
+      </td>
+    </tr>
+  </table>
+
+</body>
+</html>

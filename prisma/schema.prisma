@@ -295,7 +295,8 @@ model Appointment {
   review        Review?
   prescription  Prescription?
   payment       Payment?
-  schedules     Schedule[]
+  scheduleId String
+  schedule   Schedule @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
 
   @@map("appointments")
 }
@@ -389,6 +390,7 @@ model Payment {
   amount             Float
   transactionId      String        @unique @db.Uuid
   stripeEventId      String?      @unique
+  invoiceUrl         String?
   status             PaymentStatus @default(UNPAID)
   paymentGatewayData Json?
   createdAt          DateTime      @default(now())

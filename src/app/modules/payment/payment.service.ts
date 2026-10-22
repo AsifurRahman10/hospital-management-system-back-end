@@ -36,7 +36,7 @@ const handleStripeWebHookEvent = async (event: Stripe.Event) => {
         include: {
           patient: true,
           doctor: true,
-          schedules: true,
+          schedule: true,
           payment: true
         }
       })
@@ -47,6 +47,12 @@ const handleStripeWebHookEvent = async (event: Stripe.Event) => {
         )
         return { message: 'Appointment not found' }
       }
+
+      const appointmentSchedule = await prisma.schedule.findUnique({
+        where: { id: appointment.doctorScheduleId },
+        select: { startDateTime: true }
+      })
+
       let pdfBuffer: Buffer | null = null
 
       const result = await prisma.$transaction(async (tx) => {
@@ -64,15 +70,14 @@ const handleStripeWebHookEvent = async (event: Stripe.Event) => {
 
         let invoiceUrl = null
 
-        if (session.payment_status === 'paid') {
+        if (session.payment_status === 'paid' && appointmentSchedule) {
           try {
             pdfBuffer = await generateInvoicePdf({
               invoiceId: appointment.payment?.id || paymentId,
               patientName: appointment.patient.name,
               patientEmail: appointment.patient.email,
               doctorName: appointment.doctor.name,
-              appointmentDate:
-                appointment.schedules[0].startDateTime.toString(),
+              appointmentDate: appointmentSchedule.startDateTime.toISOString(),
               amount: appointment.payment?.amount || 0,
               transactionId: appointment.payment?.transactionId || '',
               paymentDate: new Date().toISOString()
@@ -95,6 +100,10 @@ const handleStripeWebHookEvent = async (event: Stripe.Event) => {
               pdfError
             )
           }
+        } else if (session.payment_status === 'paid') {
+          console.error(
+            `❌ Schedule ${appointment.doctorScheduleId} not found; skipping invoice PDF generation.`
+          )
         }
 
         const updatedPayment = await tx.payment.update({
@@ -127,9 +136,9 @@ const handleStripeWebHookEvent = async (event: Stripe.Event) => {
               transactionId: appointment.payment?.transactionId || '',
               paymentDate: new Date().toLocaleDateString(),
               doctorName: appointment.doctor.name,
-              appointmentDate: new Date(
-                appointment.schedules[0].startDateTime
-              ).toLocaleDateString(),
+              appointmentDate:
+                appointmentSchedule?.startDateTime.toLocaleDateString() ??
+                'N/A',
               amount: appointment.payment?.amount || 0,
               invoiceUrl: result.invoiceUrl
             },

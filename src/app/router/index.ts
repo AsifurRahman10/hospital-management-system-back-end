@@ -10,6 +10,7 @@ import { DoctorScheduleRoutes } from '../modules/doctorSchedule/doctorSchedule.r
 import { AppointmentRoutes } from '../modules/appointment/appointment.route'
 import { PatientRoutes } from '../modules/patient/patient.route'
 import { ReviewRoutes } from '../modules/review/review.route'
+import { PrescriptionRoutes } from '../modules/prescription/prescription.route'
 
 export const router = Router()
 
@@ -57,6 +58,10 @@ const moduleRouter = [
   {
     path: '/review',
     route: ReviewRoutes
+  },
+  {
+    path: '/prescription',
+    route: PrescriptionRoutes
   }
 ]
 

@@ -59,8 +59,9 @@ const bookingAppointment = async (
       data: {
         doctorId: payload.doctorId,
         patientId: patientData.id,
-        doctorScheduleId: doctorSchedule.scheduleId,
-        videoCallingId
+        scheduleId: doctorSchedule.scheduleId,
+        videoCallingId,
+        doctorScheduleId: doctorSchedule.scheduleId
       }
     })
 
@@ -384,8 +385,9 @@ const bookAppointmentWithPayLater = async (
       data: {
         doctorId: payload.doctorId,
         patientId: patientData.id,
-        doctorScheduleId: doctorSchedule.scheduleId,
-        videoCallingId
+        scheduleId: doctorSchedule.scheduleId,
+        videoCallingId,
+        doctorScheduleId: doctorSchedule.scheduleId
       }
     })
 
