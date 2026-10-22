@@ -1,15 +1,15 @@
 import { Router } from 'express'
 import { specialtyRoutes } from '../modules/specialty/specialty.route'
 import { AuthRoutes } from '../modules/auth/auth.route'
-import { UserRoutes } from '../modules/user/user.router'
+import { UserRoutes } from '../modules/user/user.route'
 import { DoctorRoutes } from '../modules/doctor/doctor.route'
 import { AdminRoutes } from '../modules/admin/admin.route'
 import { SuperAdminRoutes } from '../modules/superAdmin/superAdmin.route'
-import { ScheduleRoutes } from '../modules/schedule/schedule.router'
+import { ScheduleRoutes } from '../modules/schedule/schedule.route'
 import { DoctorScheduleRoutes } from '../modules/doctorSchedule/doctorSchedule.route'
-import { AppointmentRoutes } from '../modules/appointment/appointment.router'
+import { AppointmentRoutes } from '../modules/appointment/appointment.route'
 import { PatientRoutes } from '../modules/patient/patient.route'
-import { ReviewRoutes } from '../modules/review/review.router'
+import { ReviewRoutes } from '../modules/review/review.route'
 
 export const router = Router()
 
