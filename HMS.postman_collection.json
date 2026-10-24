@@ -1,10 +1,10 @@
 {
 	"info": {
-		"_postman_id": "5be6ec74-f8bc-4a3b-b9ea-312443d5d391",
+		"_postman_id": "aaeefe1b-d483-4f56-82ef-62503d719a05",
 		"name": "HMS",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
 		"_exporter_id": "40151530",
-		"_collection_link": "https://team-virus.postman.co/workspace/Team-virus-Workspace~1bca1256-8c64-4f9a-88fb-84aae9fac6fe/collection/40151530-5be6ec74-f8bc-4a3b-b9ea-312443d5d391?action=share&source=collection_link&creator=40151530"
+		"_collection_link": "https://team-virus.postman.co/workspace/Team-virus-Workspace~1bca1256-8c64-4f9a-88fb-84aae9fac6fe/collection/40151530-aaeefe1b-d483-4f56-82ef-62503d719a05?action=share&source=collection_link&creator=40151530"
 	},
 	"item": [
 		{
@@ -16,24 +16,21 @@
 						"method": "POST",
 						"header": [],
 						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"title\": \"Test_2\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "data",
+									"value": "{\n    \"title\": \"Cardiology\"\n}",
+									"type": "text"
+								},
+								{
+									"key": "image",
+									"type": "file",
+									"src": "/home/virus-smk/Downloads/images.jpeg"
 								}
-							}
-						},
-						"url": {
-							"raw": "{{localurl}}api/v1/specialty",
-							"host": [
-								"{{localurl}}api"
-							],
-							"path": [
-								"v1",
-								"specialty"
 							]
-						}
+						},
+						"url": "{{localurl}}api/v1/specialty"
 					},
 					"response": []
 				},
@@ -51,17 +48,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{localurl}}api/v1/specialty/01a0e2ac-e293-752a-bcda-d149710948ba",
-							"host": [
-								"{{localurl}}api"
-							],
-							"path": [
-								"v1",
-								"specialty",
-								"01a0e2ac-e293-752a-bcda-d149710948ba"
-							]
-						}
+						"url": "{{localurl}}api/v1/specialty/01a0e2ac-e293-752a-bcda-d149710948ba"
 					},
 					"response": []
 				},
@@ -79,17 +66,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{localurl}}api/v1/specialty/01a0e2ac-e293-752a-bcda-d149710948ba",
-							"host": [
-								"{{localurl}}api"
-							],
-							"path": [
-								"v1",
-								"specialty",
-								"01a0e2ac-e293-752a-bcda-d149710948ba"
-							]
-						}
+						"url": "{{localurl}}api/v1/specialty/01a0e2ac-e293-752a-bcda-d149710948ba"
 					},
 					"response": []
 				},
@@ -110,16 +87,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{localurl}}api/v1/specialty",
-							"host": [
-								"{{localurl}}api"
-							],
-							"path": [
-								"v1",
-								"specialty"
-							]
-						}
+						"url": "{{localurl}}api/v1/specialty"
 					},
 					"response": []
 				},
@@ -140,17 +108,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{localurl}}api/v1/specialty/01a0e2ac-e293-752a-bcda-d149710948ba",
-							"host": [
-								"{{localurl}}api"
-							],
-							"path": [
-								"v1",
-								"specialty",
-								"01a0e2ac-e293-752a-bcda-d149710948ba"
-							]
-						}
+						"url": "{{localurl}}api/v1/specialty/01a0e2ac-e293-752a-bcda-d149710948ba"
 					},
 					"response": []
 				}
@@ -166,29 +124,19 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"test\",\n    \"email\": \"test@gmail.com\",\n    \"password\" : \"12345556\"\n}",
+							"raw": "{\n    \"name\": \"test\",\n    \"email\": \"zahinshomik1@gmail.com\",\n    \"password\" : \"12345556\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
 								}
 							}
 						},
-						"url": {
-							"raw": "{{localurl}}api/v1/auth/register",
-							"host": [
-								"{{localurl}}api"
-							],
-							"path": [
-								"v1",
-								"auth",
-								"register"
-							]
-						}
+						"url": "{{localurl}}api/v1/auth/register"
 					},
 					"response": []
 				},
 				{
-					"name": "login",
+					"name": "login(patient)",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
 					},
@@ -197,24 +145,183 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\": \"test@gmail.com\",\n    \"password\" : \"12345556asc\"\n}",
+							"raw": "{\n    \"email\": \"zahinshomik1@gmail.com\",\n    \"password\" : \"12345556\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
 								}
 							}
 						},
-						"url": {
-							"raw": "{{localurl}}api/v1/auth/login",
-							"host": [
-								"{{localurl}}api"
-							],
-							"path": [
-								"v1",
-								"auth",
-								"login"
-							]
-						}
+						"url": "{{localurl}}api/v1/auth/login"
+					},
+					"response": []
+				},
+				{
+					"name": "login(Super-admin)",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"superadmin@email.com\",\n    \"password\" : \"12345678\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{localurl}}api/v1/auth/login"
+					},
+					"response": []
+				},
+				{
+					"name": "login(Doctor)",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"saif.chowdhury@example.com\",\n    \"password\" : \"Doctor@12345\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{localurl}}api/v1/auth/login"
+					},
+					"response": []
+				},
+				{
+					"name": "google-login",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"zahinshomik@gmail.com\",\n    \"password\" : \"SHomik4904@\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{localurl}}api/v1/auth/login/google"
+					},
+					"response": []
+				},
+				{
+					"name": "get-me",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"test@gmail.com\",\n    \"password\" : \"12345556\"\n}"
+						},
+						"url": "{{localurl}}api/v1/auth/me"
+					},
+					"response": []
+				},
+				{
+					"name": "change-password",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"oldPassword\": \"12345556\",\n    \"newPassword\" : \"123455567\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{localurl}}api/v1/auth/change-password"
+					},
+					"response": []
+				},
+				{
+					"name": "logout",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"oldPassword\": \"12345556\",\n    \"newPassword\" : \"123455567\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{localurl}}api/v1/auth/logout"
+					},
+					"response": []
+				},
+				{
+					"name": "verify-email",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"zahinshomik@gmail.com\",\n    \"otp\" : \"757951\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{localurl}}api/v1/auth/verify-email"
+					},
+					"response": []
+				},
+				{
+					"name": "forget-password",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"zahinshomik@gmail.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{localurl}}api/v1/auth/forget-password"
+					},
+					"response": []
+				},
+				{
+					"name": "reset-password",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"zahinshomik@gmail.com\",\n    \"newPassword\" : \"SHomik4904@\",\n    \"otp\" : \"392224\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{localurl}}api/v1/auth/reset-password"
 					},
 					"response": []
 				}
@@ -224,30 +331,20 @@
 			"name": "User",
 			"item": [
 				{
-					"name": "register-user",
+					"name": "register-doctor",
 					"request": {
 						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"password\": \"Doctor@12345\",\n  \"doctor\": {\n    \"name\": \"Dr. Rahman Ahmed Sabbir\",\n    \"profilePhoto\": \"https://example.com/images/doctor.jpg\",\n    \"contactNumber\": \"+8801712345678\",\n    \"address\": \"Dhanmondi, Dhaka, Bangladesh\",\n    \"registrationNumber\": \"BMDC-A-123456\",\n    \"experience\": 8,\n    \"gender\": \"MALE\",\n    \"appointmentFee\": 1000,\n    \"qualifications\": \"MBBS, FCPS (Medicine)\",\n    \"currentWorkplace\": \"Dhaka Medical College Hospital\",\n    \"designation\": \"Consultant Physician\"\n  },\n  \"specialties\": [\"01a124f9-1a35-731c-88ef-4d903fc66d79\", \"01a124f9-551d-71f4-80b1-9ae4c595ef64\"]\n}",
+							"raw": "{\n    \"password\": \"Doctor@12345\",\n    \"doctor\": {\n      \"name\": \"Dr. Saif Ahmed Chowdhury\",\n      \"email\": \"saif.chowdhury@example.com\",\n      \"profilePhoto\": \"https://example.com/images/doctor-5.jpg\",\n      \"contactNumber\": \"+8801512345675\",\n      \"address\": \"Mohammadpur, Dhaka, Bangladesh\",\n      \"registrationNumber\": \"BMDC-A-123461\",\n      \"experience\": 9,\n      \"gender\": \"MALE\",\n      \"appointmentFee\": 1300,\n      \"qualifications\": \"MBBS, MD (Neurology), Fellowship in Stroke Medicine\",\n      \"currentWorkplace\": \"Dhaka Medical College Hospital\",\n      \"designation\": \"Associate Professor\"\n    },\n    \"specialties\": [\n      \"01a13fe4-81b1-776d-b7b9-9b260ad71c81\",\n      \"01a13fe4-8953-73ef-a24a-2b554391612a\"\n    ]\n  }",
 							"options": {
 								"raw": {
 									"language": "json"
 								}
 							}
 						},
-						"url": {
-							"raw": "{{localurl}}api/v1/user/register-doctor",
-							"host": [
-								"{{localurl}}api"
-							],
-							"path": [
-								"v1",
-								"user",
-								"register-doctor"
-							]
-						}
+						"url": "{{localurl}}api/v1/user/register-doctor"
 					},
 					"response": []
 				},
@@ -265,17 +362,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{localurl}}api/v1/user/create-admin",
-							"host": [
-								"{{localurl}}api"
-							],
-							"path": [
-								"v1",
-								"user",
-								"create-admin"
-							]
-						}
+						"url": "{{localurl}}api/v1/user/create-admin"
 					},
 					"response": []
 				},
@@ -284,17 +371,6 @@
 					"request": {
 						"method": "POST",
 						"header": [],
-						"url": {
-							"raw": "{{localurl}}api/v1/user/create-super-admin",
-							"host": [
-								"{{localurl}}api"
-							],
-							"path": [
-								"v1",
-								"user",
-								"create-super-admin"
-							]
-						},
 						"body": {
 							"mode": "raw",
 							"raw": "{\n    \"password\": \"super12345\",\n    \"superAdmin\": {\n        \"name\": \"Jane Root\",\n        \"email\": \"jane.root@example.com\",\n        \"contactNumber\": \"+1987654321\",\n        \"profilePhoto\": \"https://example.com/jane.jpg\"\n    }\n}",
@@ -303,7 +379,8 @@
 									"language": "json"
 								}
 							}
-						}
+						},
+						"url": "{{localurl}}api/v1/user/create-super-admin"
 					},
 					"response": []
 				}
@@ -332,6 +409,58 @@
 							"path": [
 								"v1",
 								"doctor"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "2",
+									"disabled": true
+								},
+								{
+									"key": "limit",
+									"value": "2",
+									"disabled": true
+								},
+								{
+									"key": "searchTerm",
+									"value": "Cardio",
+									"disabled": true
+								},
+								{
+									"key": "gender",
+									"value": "FEMALE",
+									"disabled": true
+								},
+								{
+									"key": "appointmentFee[gte]",
+									"value": "1000",
+									"disabled": true
+								},
+								{
+									"key": "appointmentFee[lte]",
+									"value": null,
+									"disabled": true
+								},
+								{
+									"key": "fields",
+									"value": "name",
+									"disabled": true
+								},
+								{
+									"key": "sortBy",
+									"value": "name",
+									"disabled": true
+								},
+								{
+									"key": "sortOrder",
+									"value": "asc",
+									"disabled": true
+								},
+								{
+									"key": "experience[gt]",
+									"value": null,
+									"disabled": true
+								}
 							]
 						}
 					},
@@ -351,17 +480,7 @@
 								}
 							}
 						},
-						"url": {
-							"raw": "{{localurl}}api/v1/doctor/01a12573-516c-7348-a698-0bafd69fe57b",
-							"host": [
-								"{{localurl}}api"
-							],
-							"path": [
-								"v1",
-								"doctor",
-								"01a12573-516c-7348-a698-0bafd69fe57b"
-							]
-						}
+						"url": "{{localurl}}api/v1/doctor/01a12573-516c-7348-a698-0bafd69fe57b"
 					},
 					"response": []
 				},
@@ -377,17 +496,7 @@
 							"mode": "raw",
 							"raw": "{\n    \"name\" : \"Dr. Rahman Ahmed Asif\"\n}"
 						},
-						"url": {
-							"raw": "{{localurl}}api/v1/doctor/01a12512-cd12-77cd-969a-de42a218891c",
-							"host": [
-								"{{localurl}}api"
-							],
-							"path": [
-								"v1",
-								"doctor",
-								"01a12512-cd12-77cd-969a-de42a218891c"
-							]
-						}
+						"url": "{{localurl}}api/v1/doctor/01a12512-cd12-77cd-969a-de42a218891c"
 					},
 					"response": []
 				},
@@ -400,17 +509,7 @@
 							"mode": "raw",
 							"raw": "{\n    \"name\" : \"Dr. Rahman Ahmed Asif\"\n}"
 						},
-						"url": {
-							"raw": "{{localurl}}api/v1/doctor/01a12512-cd12-77cd-969a-de42a218891c",
-							"host": [
-								"{{localurl}}api"
-							],
-							"path": [
-								"v1",
-								"doctor",
-								"01a12512-cd12-77cd-969a-de42a218891c"
-							]
-						}
+						"url": "{{localurl}}api/v1/doctor/01a12512-cd12-77cd-969a-de42a218891c"
 					},
 					"response": []
 				}
@@ -424,21 +523,9 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": {
-							"raw": "{{localurl}}api/v1/admin",
-							"host": [
-								"{{localurl}}api"
-							],
-							"path": [
-								"v1",
-								"admin"
-							]
-						}
+						"url": "{{localurl}}api/v1/admin"
 					},
-					"response": [],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					}
+					"response": []
 				},
 				{
 					"name": "get-admin-by-id",
@@ -454,19 +541,30 @@
 								"v1",
 								"admin",
 								":adminId"
+							],
+							"variable": [
+								{
+									"key": "adminId"
+								}
 							]
 						}
 					},
-					"response": [],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					}
+					"response": []
 				},
 				{
 					"name": "update-admin",
 					"request": {
 						"method": "PATCH",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"John Updated\",\n    \"contactNumber\": \"+1111111111\",\n    \"profilePhoto\": \"https://example.com/new.jpg\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
 						"url": {
 							"raw": "{{localurl}}api/v1/admin/:adminId",
 							"host": [
@@ -476,16 +574,12 @@
 								"v1",
 								"admin",
 								":adminId"
-							]
-						},
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"name\": \"John Updated\",\n    \"contactNumber\": \"+1111111111\",\n    \"profilePhoto\": \"https://example.com/new.jpg\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
+							],
+							"variable": [
+								{
+									"key": "adminId"
 								}
-							}
+							]
 						}
 					},
 					"response": []
@@ -504,6 +598,11 @@
 								"v1",
 								"admin",
 								":adminId"
+							],
+							"variable": [
+								{
+									"key": "adminId"
+								}
 							]
 						}
 					},
@@ -519,21 +618,9 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": {
-							"raw": "{{localurl}}api/v1/super-admin",
-							"host": [
-								"{{localurl}}api"
-							],
-							"path": [
-								"v1",
-								"super-admin"
-							]
-						}
+						"url": "{{localurl}}api/v1/super-admin"
 					},
-					"response": [],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					}
+					"response": []
 				},
 				{
 					"name": "get-super-admin-by-id",
@@ -549,19 +636,30 @@
 								"v1",
 								"super-admin",
 								":superAdminId"
+							],
+							"variable": [
+								{
+									"key": "superAdminId"
+								}
 							]
 						}
 					},
-					"response": [],
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					}
+					"response": []
 				},
 				{
 					"name": "update-super-admin",
 					"request": {
 						"method": "PATCH",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Jane Updated\",\n    \"contactNumber\": \"+2222222222\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
 						"url": {
 							"raw": "{{localurl}}api/v1/super-admin/:superAdminId",
 							"host": [
@@ -571,16 +669,12 @@
 								"v1",
 								"super-admin",
 								":superAdminId"
-							]
-						},
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"name\": \"Jane Updated\",\n    \"contactNumber\": \"+2222222222\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
+							],
+							"variable": [
+								{
+									"key": "superAdminId"
 								}
-							}
+							]
 						}
 					},
 					"response": []
@@ -599,8 +693,567 @@
 								"v1",
 								"super-admin",
 								":superAdminId"
+							],
+							"variable": [
+								{
+									"key": "superAdminId"
+								}
 							]
 						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Schedule",
+			"item": [
+				{
+					"name": "create-schedule",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"startDate\": \"2026-10-19\",\n  \"endDate\": \"2026-10-21\",\n  \"startTime\": \"09:00\",\n  \"endTime\": \"12:00\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{localurl}}api/v1/schedule"
+					},
+					"response": []
+				},
+				{
+					"name": "get-all-schedule",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"startDate\": \"2026-10-19\",\n  \"endDate\": \"2026-10-21\",\n  \"startTime\": \"09:00\",\n  \"endTime\": \"12:00\"\n}"
+						},
+						"url": {
+							"raw": "{{localurl}}api/v1/schedule",
+							"host": [
+								"{{localurl}}api"
+							],
+							"path": [
+								"v1",
+								"schedule"
+							],
+							"query": [
+								{
+									"key": "startDateTime",
+									"value": "2026-10-20T04:30:00.000Z",
+									"disabled": true
+								},
+								{
+									"key": "endDateTime",
+									"value": "2026-10-20T05:00:00.000Z",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get-schedule-by-id",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"startDate\": \"2026-10-19\",\n  \"endDate\": \"2026-10-21\",\n  \"startTime\": \"09:00\",\n  \"endTime\": \"12:00\"\n}"
+						},
+						"url": {
+							"raw": "{{localurl}}api/v1/schedule/01a158b5-cb65-73e0-8913-e673b6381d9b",
+							"host": [
+								"{{localurl}}api"
+							],
+							"path": [
+								"v1",
+								"schedule",
+								"01a158b5-cb65-73e0-8913-e673b6381d9b"
+							],
+							"query": [
+								{
+									"key": "startDateTime",
+									"value": "2026-10-20T04:30:00.000Z",
+									"disabled": true
+								},
+								{
+									"key": "endDateTime",
+									"value": "2026-10-20T05:00:00.000Z",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update-schedule",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "\n{\n  \"startDate\": \"2026-10-20\",\n  \"endDate\": \"2026-10-20\",\n  \"startTime\": \"10:00\",\n  \"endTime\": \"10:30\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{localurl}}api/v1/schedule/01a14e51-61ab-75c8-ba94-1b43dee70e16"
+					},
+					"response": []
+				},
+				{
+					"name": "delete-schedule",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "\n{\n  \"startDate\": \"2026-10-20\",\n  \"endDate\": \"2026-10-20\",\n  \"startTime\": \"10:00\",\n  \"endTime\": \"10:30\"\n}\n"
+						},
+						"url": "{{localurl}}api/v1/schedule/01a14e51-61ab-75c8-ba94-1b43dee70e16"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Doctor Schedule",
+			"item": [
+				{
+					"name": "create-doctor-wise-schedule",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"scheduleIds\" : [\"01a16346-0d97-727d-baec-5ff9683092d6\", \"01a16346-0fed-7675-8e55-7233eb2f71a0\", \"01a16346-1244-73be-b6a2-f18abdc55350\", \"01a16346-14b5-73e6-8f54-9bb6434eee26\"]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{localurl}}api/v1/doctorSchedule/create-doctor-wise-schedule",
+							"host": [
+								"{{localurl}}api"
+							],
+							"path": [
+								"v1",
+								"doctorSchedule",
+								"create-doctor-wise-schedule"
+							],
+							"query": [
+								{
+									"key": "startDateTime",
+									"value": "2026-10-20T04:30:00.000Z",
+									"disabled": true
+								},
+								{
+									"key": "endDateTime",
+									"value": "2026-10-20T05:00:00.000Z",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get-doctor-wise-schedule",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"scheduleIds\" : [\"01a14e51-7151-749e-931e-e9706630e327\", \"01a14e51-6f16-749f-b80a-f0d121cf5460\"]\n}"
+						},
+						"url": {
+							"raw": "{{localurl}}api/v1/doctorSchedule/doctor-wise-schedules?isBooked=false",
+							"host": [
+								"{{localurl}}api"
+							],
+							"path": [
+								"v1",
+								"doctorSchedule",
+								"doctor-wise-schedules"
+							],
+							"query": [
+								{
+									"key": "startDateTime",
+									"value": "2026-10-20T04:30:00.000Z",
+									"disabled": true
+								},
+								{
+									"key": "endDateTime",
+									"value": "2026-10-20T05:00:00.000Z",
+									"disabled": true
+								},
+								{
+									"key": "isBooked",
+									"value": "false"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get-all-doctor-schedule",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"scheduleIds\" : [\"01a14e51-7151-749e-931e-e9706630e327\", \"01a14e51-6f16-749f-b80a-f0d121cf5460\"]\n}"
+						},
+						"url": {
+							"raw": "{{localurl}}api/v1/doctorSchedule",
+							"host": [
+								"{{localurl}}api"
+							],
+							"path": [
+								"v1",
+								"doctorSchedule"
+							],
+							"query": [
+								{
+									"key": "startDateTime",
+									"value": "2026-10-20T04:30:00.000Z",
+									"disabled": true
+								},
+								{
+									"key": "endDateTime",
+									"value": "2026-10-20T05:00:00.000Z",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get-id-wise-doctor-schedule",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"scheduleIds\" : [\"01a14e51-7151-749e-931e-e9706630e327\", \"01a14e51-6f16-749f-b80a-f0d121cf5460\"]\n}"
+						},
+						"url": {
+							"raw": "{{localurl}}api/v1/doctorSchedule/01a13fe8-19e4-709a-8452-ad3d5e4232f0/schedule/01a14e51-7151-749e-931e-e9706630e327",
+							"host": [
+								"{{localurl}}api"
+							],
+							"path": [
+								"v1",
+								"doctorSchedule",
+								"01a13fe8-19e4-709a-8452-ad3d5e4232f0",
+								"schedule",
+								"01a14e51-7151-749e-931e-e9706630e327"
+							],
+							"query": [
+								{
+									"key": "startDateTime",
+									"value": "2026-10-20T04:30:00.000Z",
+									"disabled": true
+								},
+								{
+									"key": "endDateTime",
+									"value": "2026-10-20T05:00:00.000Z",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update-doctor-wise-schedule",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"scheduleIds\" : [{\n    \"shouldDelete\" : true,\n    \"id\": \"01a14e51-7151-749e-931e-e9706630e327\"\n  }]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{localurl}}api/v1/doctorSchedule/update-own-doctor-schedule",
+							"host": [
+								"{{localurl}}api"
+							],
+							"path": [
+								"v1",
+								"doctorSchedule",
+								"update-own-doctor-schedule"
+							],
+							"query": [
+								{
+									"key": "startDateTime",
+									"value": "2026-10-20T04:30:00.000Z",
+									"disabled": true
+								},
+								{
+									"key": "endDateTime",
+									"value": "2026-10-20T05:00:00.000Z",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Appointment",
+			"item": [
+				{
+					"name": "book-appointment",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"doctorId\" : \"01a13fe8-19e4-709a-8452-ad3d5e4232f0\",\n  \"scheduleId\" : \"01a16346-0fed-7675-8e55-7233eb2f71a0\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{localurl}}api/v1/appointment/book-appointment",
+							"host": [
+								"{{localurl}}api"
+							],
+							"path": [
+								"v1",
+								"appointment",
+								"book-appointment"
+							],
+							"query": [
+								{
+									"key": "startDateTime",
+									"value": "2026-10-20T04:30:00.000Z",
+									"disabled": true
+								},
+								{
+									"key": "endDateTime",
+									"value": "2026-10-20T05:00:00.000Z",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "initiate-payment",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"doctorId\" : \"01a13fe8-19e4-709a-8452-ad3d5e4232f0\",\n  \"scheduleId\" : \"01a158b5-d8a3-77ef-863e-ba3c52890195\"\n}"
+						},
+						"url": {
+							"raw": "{{localurl}}api/v1/appointment/initiate-payment/cc96afa1-9ffe-4c70-8fd5-9b8bb7705cb8",
+							"host": [
+								"{{localurl}}api"
+							],
+							"path": [
+								"v1",
+								"appointment",
+								"initiate-payment",
+								"cc96afa1-9ffe-4c70-8fd5-9b8bb7705cb8"
+							],
+							"query": [
+								{
+									"key": "startDateTime",
+									"value": "2026-10-20T04:30:00.000Z",
+									"disabled": true
+								},
+								{
+									"key": "endDateTime",
+									"value": "2026-10-20T05:00:00.000Z",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "book-appointment-pay-later",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"doctorId\" : \"01a13fe8-19e4-709a-8452-ad3d5e4232f0\",\n  \"scheduleId\" : \"01a158b5-d1e1-7457-b2d7-f414a5186727\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{localurl}}api/v1/appointment/book-appointment-with-pay-later",
+							"host": [
+								"{{localurl}}api"
+							],
+							"path": [
+								"v1",
+								"appointment",
+								"book-appointment-with-pay-later"
+							],
+							"query": [
+								{
+									"key": "startDateTime",
+									"value": "2026-10-20T04:30:00.000Z",
+									"disabled": true
+								},
+								{
+									"key": "endDateTime",
+									"value": "2026-10-20T05:00:00.000Z",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Patient",
+			"item": [
+				{
+					"name": "update-my-profile",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "data",
+									"value": "{\n  \"patientInfo\": {\n    \"name\": \"Rahim Ahmed\",\n    \"profilePhoto\": \"https://example.com/profile.jpg\",\n    \"contactNumber\": \"+8801712345678\",\n    \"address\": \"Dhaka, Bangladesh\"\n  },\n  \"patientHealthData\": {\n    \"gender\": \"MALE\",\n    \"dateOfBirth\": \"1998-05-15\",\n    \"bloodGroup\": \"O_POSITIVE\",\n    \"hasAllergies\": true,\n    \"hasDiabetes\": false,\n    \"height\": \"175 cm\",\n    \"weight\": \"75 kg\",\n    \"smokingStatus\": false,\n    \"dietaryPreferences\": \"Vegetarian\",\n    \"pregnancyStatus\": false,\n    \"mentalHealthHistory\": \"No known history\",\n    \"immunizationStatus\": \"Fully vaccinated\",\n    \"hasPastSurgeries\": false,\n    \"recentAnxiety\": false,\n    \"recentDepression\": false\n  }\n}",
+									"type": "text"
+								},
+								{
+									"key": "profilePhoto",
+									"type": "file",
+									"src": "/home/virus-smk/Downloads/images.jpeg"
+								},
+								{
+									"key": "medicalReports",
+									"type": "file",
+									"src": [
+										"/home/virus-smk/Downloads/dummy_medical_reports.pdf",
+										"/home/virus-smk/Downloads/Asifur_Rahman_Resume.pdf"
+									]
+								}
+							]
+						},
+						"url": {
+							"raw": "{{localurl}}api/v1/patient/update-my-profile",
+							"host": [
+								"{{localurl}}api"
+							],
+							"path": [
+								"v1",
+								"patient",
+								"update-my-profile"
+							],
+							"query": [
+								{
+									"key": "startDateTime",
+									"value": "2026-10-20T04:30:00.000Z",
+									"disabled": true
+								},
+								{
+									"key": "endDateTime",
+									"value": "2026-10-20T05:00:00.000Z",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Review",
+			"item": [
+				{
+					"name": "give-review",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"test@gmail.com\",\n    \"password\" : \"12345556\"\n}"
+						},
+						"url": "{{localurl}}api/v1/review"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Prescription",
+			"item": [
+				{
+					"name": "create-prescription",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"appointmentId\": \"4eb9be73-ab82-47f4-9055-5e271228a59b\",\n  \"instructions\": \"Take the prescribed medication as directed by your doctor. Drink plenty of water, get adequate rest, and avoid self-medication. If symptoms persist or worsen, contact your healthcare provider. Attend your follow-up appointment as scheduled.\",\n  \"followUpDate\": \"2026-11-05\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{localurl}}api/v1/prescription"
 					},
 					"response": []
 				}
