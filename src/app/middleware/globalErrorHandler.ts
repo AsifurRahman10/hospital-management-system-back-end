@@ -7,6 +7,13 @@ import { Prisma } from '../../../generated/prisma/client'
 import AppError from '../shared/AppError'
 import { deleteImageFromCloudinary } from '../config/cloudinary.config'
 import { deleteUploadedFilesFromGlobalErrorHandler } from '../utils/deleteUploadedFilesFromGlobalErrorHandler'
+import {
+  handlePrismaClientKnownRequestError,
+  handlePrismaClientUnknownError,
+  handlePrismaClientValidationError,
+  handlerPrismaClientInitializationError,
+  handlerPrismaClientRustPanicError
+} from '../shared/handlePrismaError'
 interface TErrorSource {
   path: string
   message: string
@@ -32,10 +39,41 @@ const globalErrorHandler = async (
   await deleteUploadedFilesFromGlobalErrorHandler(req)
   let statusCode: number = status.INTERNAL_SERVER_ERROR
   let message = 'Internal Server Error'
-  let errorSource: TErrorSource[] = []
+  let errorSources: TErrorSource[] = []
+  let stack: string | undefined = undefined
 
   // Custom application errors
-  if (err instanceof AppError) {
+  if (err instanceof Prisma.PrismaClientKnownRequestError) {
+    const simplifiedError = handlePrismaClientKnownRequestError(err)
+    statusCode = simplifiedError.statusCode as number
+    message = simplifiedError.message
+    errorSources = [...simplifiedError.errorSources]
+    stack = err.stack
+  } else if (err instanceof Prisma.PrismaClientUnknownRequestError) {
+    const simplifiedError = handlePrismaClientUnknownError(err)
+    statusCode = simplifiedError.statusCode as number
+    message = simplifiedError.message
+    errorSources = [...simplifiedError.errorSources]
+    stack = err.stack
+  } else if (err instanceof Prisma.PrismaClientValidationError) {
+    const simplifiedError = handlePrismaClientValidationError(err)
+    statusCode = simplifiedError.statusCode as number
+    message = simplifiedError.message
+    errorSources = [...simplifiedError.errorSources]
+    stack = err.stack
+  } else if (err instanceof Prisma.PrismaClientRustPanicError) {
+    const simplifiedError = handlerPrismaClientRustPanicError()
+    statusCode = simplifiedError.statusCode as number
+    message = simplifiedError.message
+    errorSources = [...simplifiedError.errorSources]
+    stack = err.stack
+  } else if (err instanceof Prisma.PrismaClientInitializationError) {
+    const simplifiedError = handlerPrismaClientInitializationError(err)
+    statusCode = simplifiedError.statusCode as number
+    message = simplifiedError.message
+    errorSources = [...simplifiedError.errorSources]
+    stack = err.stack
+  } else if (err instanceof AppError) {
     statusCode = err.statusCode
     message = err.message
   }
@@ -45,51 +83,10 @@ const globalErrorHandler = async (
     statusCode = status.BAD_REQUEST
     message = 'Validation failed'
 
-    errorSource = err.issues.map((issue) => ({
+    errorSources = err.issues.map((issue) => ({
       path: issue.path.join('.'),
       message: issue.message
     }))
-  }
-
-  // Prisma known request errors
-  else if (err instanceof Prisma.PrismaClientKnownRequestError) {
-    switch (err.code) {
-      case 'P2002': {
-        statusCode = status.CONFLICT
-        message = 'A record with this value already exists'
-
-        const target = err.meta?.target
-        const fields = Array.isArray(target)
-          ? target.join(', ')
-          : typeof target === 'string'
-            ? target
-            : undefined
-
-        if (fields) {
-          errorSource = [
-            {
-              path: fields,
-              message: 'This value must be unique'
-            }
-          ]
-        }
-        break
-      }
-
-      case 'P2025':
-        statusCode = status.NOT_FOUND
-        message = 'Requested record not found'
-        break
-
-      case 'P2003':
-        statusCode = status.CONFLICT
-        message = 'Related record constraint failed'
-        break
-
-      default:
-        message = 'Database operation failed'
-        break
-    }
   }
 
   // Unexpected errors
@@ -100,7 +97,7 @@ const globalErrorHandler = async (
   const errorResponse: TErrorResponse = {
     success: false,
     message,
-    ...(errorSource.length > 0 && { errorSource }),
+    ...(errorSources.length > 0 && { errorSources }),
     ...(envConfig.NODE_ENV === 'development' &&
       err instanceof Error && {
         stack: err.stack
