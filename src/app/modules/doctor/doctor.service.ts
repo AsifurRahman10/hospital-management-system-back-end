@@ -1,4 +1,4 @@
-import { Gender } from '../../../../generated/prisma/enums'
+import { Gender, UserStatus } from '../../../../generated/prisma/enums'
 import { prisma } from '../../lib/prisma'
 import { IUser } from '../../interface'
 import AppError from '../../shared/AppError'
@@ -58,7 +58,10 @@ export const doctorIncludeConfig: Partial<
   reviews: true
 }
 
-const getAllDoctors = async (query: IQueryParams) => {
+const getAllDoctors = async (
+  query: IQueryParams,
+  includeInactiveDoctors = false
+) => {
   // const allDoctors = await prisma.doctor.findMany({
   //   include: {
   //     user: true,
@@ -78,10 +81,22 @@ const getAllDoctors = async (query: IQueryParams) => {
     filterableFields: doctorFilterableFields
   })
 
+  const visibilityFilter = includeInactiveDoctors
+    ? {}
+    : {
+        isDeleted: false,
+        user: {
+          isDeleted: false,
+          status: {
+            notIn: [UserStatus.BLOCK, UserStatus.DELETED]
+          }
+        }
+      }
+
   const result = await queryBuilder
     .search()
     .filter()
-    .where({ isDeleted: false })
+    .where(visibilityFilter)
     .dynamicInclude(doctorIncludeConfig, ['user', 'doctorSpecialties'])
     .paginate()
     .sort()
@@ -99,6 +114,7 @@ const getDoctorById = async (id: string) => {
     },
     include: {
       user: true,
+      reviews: true,
       doctorSpecialties: {
         include: {
           specialty: true

@@ -70,25 +70,25 @@ const loginUser = async (payload: ILoginPatientPayload) => {
 
 const getMe = async (userId: string) => {
   const isUserExist = await prisma.user.findUnique({
-    where: { id: userId },
-    include: {
-      patient: {
-        include: {
-          appointments: true
-          // reviews: true
-          // prescriptions: true
-        }
-      },
-      doctor: {
-        include: {
-          doctorSpecialties: true,
-          appointments: true
-          // reviews: true,
-          // prescriptions: true
-        }
-      },
-      admin: true
-    }
+    where: { id: userId }
+    // include: {
+    //   patient: {
+    //     include: {
+    //       appointments: true
+    //       // reviews: true
+    //       // prescriptions: true
+    //     }
+    //   },
+    //   doctor: {
+    //     include: {
+    //       doctorSpecialties: true,
+    //       appointments: true
+    //       // reviews: true,
+    //       // prescriptions: true
+    //     }
+    //   },
+    //   admin: true
+    // }
   })
 
   if (!isUserExist) {

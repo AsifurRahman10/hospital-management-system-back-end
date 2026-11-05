@@ -9,6 +9,22 @@ import checkAuth from '../../middleware/checkAuth'
 
 const router = Router()
 
+router.get(
+  '/',
+  checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
+  PatientController.getAllPatients
+)
+router.patch(
+  '/:id/status',
+  checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
+  validateRequest(PatientValidation.updatePatientStatusSchema),
+  PatientController.updatePatientStatus
+)
+router.delete(
+  '/:id',
+  checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
+  PatientController.deletePatient
+)
 router.patch(
   '/update-my-profile',
   checkAuth(Role.PATIENT),

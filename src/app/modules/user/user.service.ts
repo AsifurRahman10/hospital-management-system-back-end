@@ -258,14 +258,14 @@ const createSuperAdmin = async (payload: ICreateSuperAdminPayload) => {
 
   try {
     const superAdminData = await prisma.$transaction(async (tx) => {
-      const superAdmin = await tx.superAdmin.create({
+      const superAdmin = await tx.admin.create({
         data: {
           userId: user.user.id,
           ...payload.superAdmin
         }
       })
 
-      const superAdminDataFiltered = await tx.superAdmin.findUnique({
+      const superAdminDataFiltered = await tx.admin.findUnique({
         where: {
           id: superAdmin.id
         },

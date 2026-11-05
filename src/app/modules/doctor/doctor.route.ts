@@ -5,11 +5,11 @@ import { DoctorValidation } from './doctor.validation'
 import { multerUpload } from '../../config/multer.config'
 import { updateMyDoctorProfileMiddleware } from './doctor.middlewares'
 import { Role } from '../../../../generated/prisma/enums'
-import checkAuth from '../../middleware/checkAuth'
+import checkAuth, { optionalCheckAuth } from '../../middleware/checkAuth'
 
 const router = Router()
 
-router.get('/', DoctorController.getAllDoctors)
+router.get('/', optionalCheckAuth, DoctorController.getAllDoctors)
 // must be declared before '/:id' routes so it is not treated as an id
 router.patch(
   '/update-my-profile',
@@ -22,9 +22,14 @@ router.patch(
 router.get('/:id', DoctorController.getDoctorById)
 router.patch(
   '/:id',
+  checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
   validateRequest(DoctorValidation.updateDoctorValidationSchema),
   DoctorController.updateDoctor
 )
-router.delete('/:id', DoctorController.deleteDoctor)
+router.delete(
+  '/:id',
+  checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
+  DoctorController.deleteDoctor
+)
 
 export const DoctorRoutes = router

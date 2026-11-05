@@ -5,11 +5,17 @@ import sendResponse from '../../shared/sendResponse'
 import httpStatus from 'http-status'
 import { DoctorService } from './doctor.service'
 import { IUser } from '../../interface'
+import { Role } from '../../../../generated/prisma/enums'
 
 const getAllDoctors = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const query = req.query
-    const data = await DoctorService.getAllDoctors(query)
+    const includeInactiveDoctors =
+      req.user?.role === Role.ADMIN || req.user?.role === Role.SUPER_ADMIN
+    const data = await DoctorService.getAllDoctors(
+      query,
+      includeInactiveDoctors
+    )
 
     sendResponse(res, {
       statusCode: httpStatus.OK,

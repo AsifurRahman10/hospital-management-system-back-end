@@ -7,6 +7,12 @@ import {
 import { IUser } from '../../interface'
 import { prisma } from '../../lib/prisma'
 import { deleteImageFromCloudinary } from '../../config/cloudinary.config'
+import AppError from '../../shared/AppError'
+import httpStatus from 'http-status'
+import { QueryBuilder } from '../../utils/queryBuilder'
+import { IQueryParams } from '../../interface/query.interface'
+import { Patient, Prisma } from '../../../../generated/prisma/client'
+import { UserStatus } from '../../../../generated/prisma/enums'
 
 export interface IUpdatePatientInfoPayload {
   name?: string
@@ -147,6 +153,76 @@ const updateMyProfile = async (
   })
 }
 
+const getAllPatients = async (query: IQueryParams) => {
+  const queryBuilder = new QueryBuilder<
+    Patient,
+    Prisma.PatientWhereInput,
+    Prisma.PatientInclude
+  >(prisma.patient, query, {
+    searchableFields: ['name', 'email', 'contactNumber'],
+    filterableFields: ['isDeleted', 'user.status']
+  })
+
+  return queryBuilder
+    .search()
+    .filter()
+    .dynamicInclude(
+      {
+        user: true,
+        patientHealthData: true,
+        medicalReports: true,
+        appointments: true
+      },
+      ['user', 'patientHealthData', 'medicalReports']
+    )
+    .paginate()
+    .sort()
+    .fields()
+    .execute()
+}
+
+const updatePatientStatus = async (id: string, userStatus: UserStatus) => {
+  const patient = await prisma.patient.findFirst({
+    where: { id, isDeleted: false },
+    select: { userId: true }
+  })
+
+  if (!patient) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Patient not found')
+  }
+
+  return prisma.user.update({
+    where: { id: patient.userId },
+    data: { status: userStatus }
+  })
+}
+
+const deletePatient = async (id: string) => {
+  const patient = await prisma.patient.findFirst({
+    where: { id, isDeleted: false },
+    select: { userId: true }
+  })
+
+  if (!patient) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Patient not found')
+  }
+
+  const deletedAt = new Date()
+
+  await prisma.$transaction(async (tx) => {
+    await tx.patient.update({
+      where: { id },
+      data: { isDeleted: true, deletedAt }
+    })
+    await tx.user.update({
+      where: { id: patient.userId },
+      data: { isDeleted: true, deletedAt, status: UserStatus.DELETED }
+    })
+    await tx.session.deleteMany({ where: { userId: patient.userId } })
+    await tx.account.deleteMany({ where: { userId: patient.userId } })
+  })
+}
+
 const convertToDateTime = (dateString: string | undefined) => {
   if (!dateString) return undefined
 
@@ -158,5 +234,8 @@ const convertToDateTime = (dateString: string | undefined) => {
 }
 
 export const PatientService = {
-  updateMyProfile
+  updateMyProfile,
+  getAllPatients,
+  updatePatientStatus,
+  deletePatient
 }

@@ -1,5 +1,9 @@
 import z from 'zod'
-import { BloodGroup, Gender } from '../../../../generated/prisma/enums'
+import {
+  BloodGroup,
+  Gender,
+  UserStatus
+} from '../../../../generated/prisma/enums'
 
 const updatePatientProfileZodSchema = z.object({
   patientInfo: z
@@ -103,6 +107,11 @@ const updatePatientProfileZodSchema = z.object({
     )
 })
 
+const updatePatientStatusSchema = z.object({
+  status: z.enum([UserStatus.ACTIVE, UserStatus.BLOCK])
+})
+
 export const PatientValidation = {
-  updatePatientProfileZodSchema
+  updatePatientProfileZodSchema,
+  updatePatientStatusSchema
 }
