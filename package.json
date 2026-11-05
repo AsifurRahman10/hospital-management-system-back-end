@@ -8,6 +8,7 @@
     "start": "node dist/server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "tsx watch src/server.ts",
+    "db:seed:appointments": "tsx src/app/utils/seed.ts",
     "lint": "eslint ./src",
     "build": "tsc",
     "typecheck": "tsc --noEmit",
