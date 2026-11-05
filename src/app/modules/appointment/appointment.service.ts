@@ -193,7 +193,6 @@ const changeAppointmentStatus = async (
       patient: true
     }
   })
-
   const currentStatus = appointmentData.status
   const role = user.role
 

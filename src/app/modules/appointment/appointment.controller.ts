@@ -4,6 +4,7 @@ import { AppointmentService } from './appointment.service'
 import sendResponse from '../../shared/sendResponse'
 import catchAsync from '../../shared/catchAsync'
 import { IUser } from '../../interface'
+import { AppointmentStatus } from '../../../../generated/prisma/enums'
 
 const bookAppointment = catchAsync(async (req: Request, res: Response) => {
   const payload = req.body
@@ -38,12 +39,12 @@ const getMyAppointments = catchAsync(async (req: Request, res: Response) => {
 const changeAppointmentStatus = catchAsync(
   async (req: Request, res: Response) => {
     const appointmentId = req.params.id
-    const payload = req.body
+    const payload = req.body.status
     const user = req.user
 
     const updatedAppointment = await AppointmentService.changeAppointmentStatus(
       appointmentId as string,
-      payload,
+      payload as AppointmentStatus,
       user as IUser
     )
     sendResponse(res, {
