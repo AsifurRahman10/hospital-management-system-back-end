@@ -17,7 +17,15 @@ route.post(
 )
 route.get('/', specialtyController.getAllSpecialty)
 route.get('/:id', specialtyController.getSingleSpecialty)
-route.patch('/:id', specialtyController.updateSpecialty)
-route.delete('/:id', specialtyController.deleteSpecialty)
+route.patch(
+  '/:id',
+  checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
+  specialtyController.updateSpecialty
+)
+route.delete(
+  '/:id',
+  checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
+  specialtyController.deleteSpecialty
+)
 
 export const specialtyRoutes = route
