@@ -8,6 +8,11 @@ const router = Router()
 router.post('/register', AuthController.registerPatient)
 router.post('/login', AuthController.loginUser)
 router.get('/me', checkAuth(...Object.values(Role)), AuthController.getMe)
+router.get(
+  '/get-session',
+  checkAuth(...Object.values(Role)),
+  AuthController.getSession
+)
 
 router.post(
   '/change-password',

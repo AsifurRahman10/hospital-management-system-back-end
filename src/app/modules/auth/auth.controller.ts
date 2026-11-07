@@ -211,6 +211,19 @@ const googleLoginError = catchAsync(async (req: Request, res: Response) => {
   res.redirect(getGoogleErrorRedirect(redirectPath))
 })
 
+const getSession = catchAsync(async (req: Request, res: Response) => {
+  const sessionData = await AuthServices.getSession(
+    fromNodeHeaders(req.headers)
+  )
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Session retrieved successfully',
+    data: sessionData
+  })
+})
+
 export const AuthController = {
   registerPatient,
   loginUser,
@@ -222,5 +235,6 @@ export const AuthController = {
   resetPassword,
   googleLogin,
   googleLoginSuccess,
-  googleLoginError
+  googleLoginError,
+  getSession
 }

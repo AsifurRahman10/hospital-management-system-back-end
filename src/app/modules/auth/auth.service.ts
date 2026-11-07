@@ -70,30 +70,36 @@ const loginUser = async (payload: ILoginPatientPayload) => {
 
 const getMe = async (userId: string) => {
   const isUserExist = await prisma.user.findUnique({
-    where: { id: userId }
-    // include: {
-    //   patient: {
-    //     include: {
-    //       appointments: true
-    //       // reviews: true
-    //       // prescriptions: true
-    //     }
-    //   },
-    //   doctor: {
-    //     include: {
-    //       doctorSpecialties: true,
-    //       appointments: true
-    //       // reviews: true,
-    //       // prescriptions: true
-    //     }
-    //   },
-    //   admin: true
-    // }
+    where: { id: userId },
+    include: {
+      patient: {
+        include: {
+          _count: {
+            select: {
+              appointments: true
+            }
+          }
+        }
+      },
+      doctor: {
+        include: {
+          doctorSpecialties: true,
+          _count: {
+            select: {
+              appointments: true,
+              reviews: true
+            }
+          }
+        }
+      },
+      admin: true
+    }
   })
 
   if (!isUserExist) {
     throw new AppError(httpStatus.NOT_FOUND, 'User not found')
   }
+
   return isUserExist
 }
 
@@ -294,6 +300,16 @@ const resetPassword = async (
   })
 }
 
+const getSession = async (headers: Headers) => {
+  const sessionData = await auth.api.getSession({ headers })
+
+  if (!sessionData) {
+    throw new AppError(httpStatus.UNAUTHORIZED, 'No active session found')
+  }
+
+  return sessionData
+}
+
 export const AuthServices = {
   registerPatient,
   loginUser,
@@ -303,5 +319,6 @@ export const AuthServices = {
   logout,
   verifyEmail,
   forgetPassword,
-  resetPassword
+  resetPassword,
+  getSession
 }

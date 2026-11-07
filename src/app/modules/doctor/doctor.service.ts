@@ -151,13 +151,16 @@ const updateDoctor = async (payload: UpdateDoctorPayload) => {
 
   const existingDoctor = await prisma.doctor.findFirst({
     where: {
-      id: payload.id,
-      isDeleted: false
+      id: payload.id
     }
   })
 
   if (!existingDoctor) {
     throw new AppError(httpStatus.NOT_FOUND, 'Doctor not found')
+  }
+
+  if (existingDoctor.isDeleted) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Doctor is deleted')
   }
 
   if (specialties) {
@@ -374,6 +377,15 @@ const deleteDoctor = async (id: string) => {
     where: { id },
     data: {
       isDeleted: true,
+      deletedAt: new Date()
+    }
+  })
+
+  await prisma.user.update({
+    where: { id: existingDoctor.userId },
+    data: {
+      isDeleted: true,
+      status: UserStatus.DELETED,
       deletedAt: new Date()
     }
   })
