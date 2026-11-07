@@ -205,7 +205,7 @@ const generateInvoicePdf = async (data: InvoiceData): Promise<Buffer> => {
         bufferPages: true,
         info: {
           Title: `Invoice ${data.invoiceId}`,
-          Author: 'PH Healthcare Services',
+          Author: 'Life Hospital Services',
           Subject: 'Appointment Payment Invoice'
         }
       })
@@ -293,7 +293,7 @@ const generateInvoicePdf = async (data: InvoiceData): Promise<Buffer> => {
         .font('Helvetica-Bold')
         .fontSize(19)
         .fillColor(colors.white)
-        .text('PH Healthcare', margin, 35)
+        .text('Life Hospital', margin, 35)
 
       doc
         .font('Helvetica')
@@ -564,7 +564,7 @@ const generateInvoicePdf = async (data: InvoiceData): Promise<Buffer> => {
         .font('Helvetica-Bold')
         .fontSize(10)
         .fillColor(colors.dark)
-        .text('Thank you for choosing PH Healthcare', margin, footerY + 20, {
+        .text('Thank you for choosing Life Hospital', margin, footerY + 20, {
           width: contentWidth,
           align: 'center'
         })

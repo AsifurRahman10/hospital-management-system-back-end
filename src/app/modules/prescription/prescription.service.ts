@@ -174,7 +174,7 @@ const generatePrescriptionPDF = async (
         bufferPages: true,
         info: {
           Title: `Prescription ${prescriptionData.prescriptionId}`,
-          Author: 'PH Healthcare Services',
+          Author: 'Life Hospital Services',
           Subject: 'Medical Prescription'
         }
       })
@@ -264,7 +264,7 @@ const generatePrescriptionPDF = async (
         .font('Helvetica-Bold')
         .fontSize(19)
         .fillColor(colors.white)
-        .text('PH Healthcare', margin, 32)
+        .text('Life Hospital', margin, 32)
 
       doc
         .font('Helvetica')
@@ -536,7 +536,7 @@ const generatePrescriptionPDF = async (
         .font('Helvetica-Bold')
         .fontSize(9)
         .fillColor(colors.dark)
-        .text('PH Healthcare Services', margin, footerY + 14, {
+        .text('Life Hospital Services', margin, footerY + 14, {
           width: contentWidth,
           align: 'center'
         })
