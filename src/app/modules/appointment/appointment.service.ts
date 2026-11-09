@@ -138,7 +138,12 @@ export const appointmentFilterableFields = [
   'updatedAt'
 ]
 
-export const appointmentSearchableFields = ['patientId', 'doctorId', 'status']
+export const appointmentSearchableFields = [
+  'patient.name',
+  'patient.email',
+  'doctor.name',
+  'doctor.email'
+]
 
 const getMyAppointments = async (query: IQueryParams, user: IUser) => {
   const userData =

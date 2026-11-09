@@ -1,4 +1,4 @@
-import { Gender, UserStatus } from '../../../../generated/prisma/enums'
+import { Gender, PaymentStatus, UserStatus } from '../../../../generated/prisma/enums'
 import { prisma } from '../../lib/prisma'
 import { IUser } from '../../interface'
 import AppError from '../../shared/AppError'
@@ -393,9 +393,157 @@ const deleteDoctor = async (id: string) => {
   return deletedDoctor
 }
 
+const getBestPerformingDoctors = async (limit = 5) => {
+  const targetCount = Math.max(1, limit)
+
+  // Fetch active doctors with appointments (for earnings), reviews (for ratings & review count), and user/specialties
+  const activeDoctors = await prisma.doctor.findMany({
+    where: {
+      isDeleted: false,
+      user: {
+        isDeleted: false,
+        status: {
+          notIn: [UserStatus.BLOCK, UserStatus.DELETED]
+        }
+      }
+    },
+    include: {
+      user: true,
+      doctorSpecialties: {
+        include: {
+          specialty: true
+        }
+      },
+      reviews: {
+        select: {
+          id: true,
+          rating: true
+        }
+      },
+      appointments: {
+        where: {
+          paymentStatus: PaymentStatus.PAID
+        },
+        select: {
+          id: true,
+          payment: {
+            select: {
+              amount: true,
+              status: true
+            }
+          }
+        }
+      }
+    }
+  })
+
+  if (!activeDoctors.length) {
+    return []
+  }
+
+  // Calculate metrics for each doctor
+  const processedDoctors = activeDoctors.map((doc) => {
+    const reviewCount = doc.reviews.length
+    const computedAverageRating =
+      reviewCount > 0
+        ? doc.reviews.reduce((acc, curr) => acc + curr.rating, 0) / reviewCount
+        : 0
+
+    const averageRating =
+      doc.averageRating && doc.averageRating > 0
+        ? doc.averageRating
+        : computedAverageRating
+
+    const totalEarnings = doc.appointments.reduce((sum, apt) => {
+      if (apt.payment && apt.payment.status === PaymentStatus.PAID) {
+        return sum + (apt.payment.amount || 0)
+      }
+      return sum
+    }, 0)
+
+    const restDoctor = { ...doc }
+    delete (restDoctor as { appointments?: unknown }).appointments
+    delete (restDoctor as { reviews?: unknown }).reviews
+
+    return {
+      doctor: {
+        ...restDoctor,
+        averageRating: Number(averageRating.toFixed(1))
+      },
+      reviewCount,
+      totalEarnings: Number(totalEarnings.toFixed(2)),
+      averageRating: Number(averageRating.toFixed(1)),
+      appointmentCount: doc.appointments.length
+    }
+  })
+
+  // Normalize scores based on max reviews and earnings in dataset
+  const maxReviews = Math.max(...processedDoctors.map((d) => d.reviewCount), 0)
+  const maxEarnings = Math.max(...processedDoctors.map((d) => d.totalEarnings), 0)
+
+  // Performance requirements:
+  // - average rating >= 4.0
+  // - at least 1 review
+  // - positive earnings (> 0)
+  const scoredDoctors = processedDoctors.map((item) => {
+    const normRating = item.averageRating / 5
+    const normReviews = maxReviews > 0 ? item.reviewCount / maxReviews : 0
+    const normEarnings = maxEarnings > 0 ? item.totalEarnings / maxEarnings : 0
+
+    // Weighted composite score (40% rating, 30% reviews, 30% earnings)
+    const score = normRating * 0.4 + normReviews * 0.3 + normEarnings * 0.3
+
+    const meetsRequirement =
+      item.averageRating >= 4.0 &&
+      item.reviewCount >= 1 &&
+      item.totalEarnings > 0
+
+    return {
+      ...item.doctor,
+      reviewCount: item.reviewCount,
+      totalEarnings: item.totalEarnings,
+      appointmentCount: item.appointmentCount,
+      performanceScore: Number(score.toFixed(3)),
+      isBestPerforming: meetsRequirement
+    }
+  })
+
+  // Separate qualifying doctors and non-qualifying doctors
+  const qualifyingDoctors = scoredDoctors
+    .filter((d) => d.isBestPerforming)
+    .sort((a, b) => b.performanceScore - a.performanceScore)
+
+  const nonQualifyingDoctors = scoredDoctors.filter((d) => !d.isBestPerforming)
+
+  // Fisher-Yates shuffle helper
+  const shuffleArray = <T>(array: T[]): T[] => {
+    const shuffled = [...array]
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1))
+      ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+    }
+    return shuffled
+  }
+
+  // If we have enough qualifying doctors, return top targetCount
+  if (qualifyingDoctors.length >= targetCount) {
+    return qualifyingDoctors.slice(0, targetCount)
+  }
+
+  // If not enough doctors meet requirements, fill remaining slots with random doctors
+  const selectedDoctors = [...qualifyingDoctors]
+  const remainingNeeded = targetCount - selectedDoctors.length
+
+  const shuffledRemaining = shuffleArray(nonQualifyingDoctors)
+  selectedDoctors.push(...shuffledRemaining.slice(0, remainingNeeded))
+
+  return selectedDoctors
+}
+
 export const DoctorService = {
   getAllDoctors,
   getDoctorById,
+  getBestPerformingDoctors,
   updateDoctor,
   updateMyProfile,
   deleteDoctor

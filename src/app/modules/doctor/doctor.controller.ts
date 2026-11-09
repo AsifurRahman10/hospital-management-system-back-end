@@ -85,9 +85,24 @@ const updateMyProfile = catchAsync(async (req: Request, res: Response) => {
   })
 })
 
+const getBestPerformingDoctors = catchAsync(
+  async (req: Request, res: Response) => {
+    const limit = req.query.limit ? Number(req.query.limit) : 5
+    const data = await DoctorService.getBestPerformingDoctors(limit)
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'Best performing doctors retrieved successfully',
+      data
+    })
+  }
+)
+
 export const DoctorController = {
   getAllDoctors,
   getDoctorById,
+  getBestPerformingDoctors,
   updateDoctor,
   deleteDoctor,
   updateMyProfile

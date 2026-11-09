@@ -21,6 +21,7 @@ router.post(
 )
 
 router.post('/logout', checkAuth(...Object.values(Role)), AuthController.logout)
+router.post('/resend-verification-email', AuthController.sendVerificationEmail)
 router.post('/verify-email', AuthController.verifyEmail)
 router.post('/forget-password', AuthController.forgetPassword)
 router.post('/reset-password', AuthController.resetPassword)

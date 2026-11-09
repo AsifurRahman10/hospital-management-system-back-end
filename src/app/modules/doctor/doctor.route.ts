@@ -11,6 +11,7 @@ const router = Router()
 
 router.get('/', optionalCheckAuth, DoctorController.getAllDoctors)
 // must be declared before '/:id' routes so it is not treated as an id
+router.get('/best-doctors', DoctorController.getBestPerformingDoctors)
 router.patch(
   '/update-my-profile',
   checkAuth(Role.DOCTOR),

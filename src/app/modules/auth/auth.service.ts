@@ -310,6 +310,38 @@ const getSession = async (headers: Headers) => {
   return sessionData
 }
 
+const sendVerificationEmail = async (email: string) => {
+  const user = await prisma.user.findUnique({
+    where: {
+      email
+    }
+  })
+
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found')
+  }
+
+  if (user.emailVerified) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Email is already verified')
+  }
+
+  await auth.api.sendVerificationOTP({
+    body: {
+      email,
+      type: 'email-verification'
+    }
+  })
+
+  await prisma.user.update({
+    where: {
+      email
+    },
+    data: {
+      emailVerified: false
+    }
+  })
+}
+
 export const AuthServices = {
   registerPatient,
   loginUser,
@@ -320,5 +352,6 @@ export const AuthServices = {
   verifyEmail,
   forgetPassword,
   resetPassword,
-  getSession
+  getSession,
+  sendVerificationEmail
 }
