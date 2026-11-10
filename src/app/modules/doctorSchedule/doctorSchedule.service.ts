@@ -23,7 +23,8 @@ const createDoctorWiseSchedule = async (
   }))
 
   await prisma.doctorSchedules.createMany({
-    data: doctorScheduleData
+    data: doctorScheduleData,
+    skipDuplicates: true
   })
 
   const result = await prisma.doctorSchedules.findMany({

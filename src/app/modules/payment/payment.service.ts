@@ -48,15 +48,11 @@ const handleStripeWebHookEvent = async (event: Stripe.Event) => {
         return { message: 'Appointment not found' }
       }
 
-      const appointmentSchedule = await prisma.schedule.findUnique({
-        where: { id: appointment.doctorScheduleId },
-        select: { startDateTime: true }
-      })
+      const appointmentSchedule = appointment.schedule
 
-      let pdfBuffer: Buffer | null = null
-
-      const result = await prisma.$transaction(async (tx) => {
-        const updatedAppointment = await tx.appointment.update({
+      // Step 1: Fast database transaction for appointment and payment status
+      await prisma.$transaction(async (tx) => {
+        await tx.appointment.update({
           where: {
             id: appointmentId
           },
@@ -68,45 +64,7 @@ const handleStripeWebHookEvent = async (event: Stripe.Event) => {
           }
         })
 
-        let invoiceUrl = null
-
-        if (session.payment_status === 'paid' && appointmentSchedule) {
-          try {
-            pdfBuffer = await generateInvoicePdf({
-              invoiceId: appointment.payment?.id || paymentId,
-              patientName: appointment.patient.name,
-              patientEmail: appointment.patient.email,
-              doctorName: appointment.doctor.name,
-              appointmentDate: appointmentSchedule.startDateTime.toISOString(),
-              amount: appointment.payment?.amount || 0,
-              transactionId: appointment.payment?.transactionId || '',
-              paymentDate: new Date().toISOString()
-            })
-
-            // Upload PDF to Cloudinary
-            const cloudinaryResponse = await uploadFileToCloudinary(
-              pdfBuffer,
-              `ph-healthcare/invoices/invoice-${paymentId}-${Date.now()}.pdf`
-            )
-
-            invoiceUrl = cloudinaryResponse?.secure_url
-
-            console.log(
-              `✅ Invoice PDF generated and uploaded for payment ${paymentId}`
-            )
-          } catch (pdfError) {
-            console.error(
-              '❌ Error generating/uploading invoice PDF:',
-              pdfError
-            )
-          }
-        } else if (session.payment_status === 'paid') {
-          console.error(
-            `❌ Schedule ${appointment.doctorScheduleId} not found; skipping invoice PDF generation.`
-          )
-        }
-
-        const updatedPayment = await tx.payment.update({
+        await tx.payment.update({
           where: {
             id: paymentId
           },
@@ -116,44 +74,85 @@ const handleStripeWebHookEvent = async (event: Stripe.Event) => {
                 ? PaymentStatus.PAID
                 : PaymentStatus.UNPAID,
             paymentGatewayData: session,
-            invoiceUrl: invoiceUrl, // Store invoice URL
             stripeEventId: event.id // Store event ID for idempotency
           }
         })
-
-        return { updatedAppointment, updatedPayment, invoiceUrl }
       })
 
-      if (session.payment_status === 'paid' && result.invoiceUrl) {
+      // Step 2: Handle PDF generation, upload, and email outside database transaction
+      let invoiceUrl: string | null = null
+      let pdfBuffer: Buffer | null = null
+
+      if (session.payment_status === 'paid') {
         try {
-          await sendEmail({
-            to: appointment.patient.email,
-            subject: `Payment Confirmation & Invoice - Appointment with ${appointment.doctor.name}`,
-            templateName: 'invoice',
-            templateData: {
-              patientName: appointment.patient.name,
-              invoiceId: appointment.payment?.id || paymentId,
-              transactionId: appointment.payment?.transactionId || '',
-              paymentDate: new Date().toLocaleDateString(),
-              doctorName: appointment.doctor.name,
-              appointmentDate:
-                appointmentSchedule?.startDateTime.toLocaleDateString() ??
-                'N/A',
-              amount: appointment.payment?.amount || 0,
-              invoiceUrl: result.invoiceUrl
-            },
-            attachments: [
-              {
-                filename: `Invoice-${paymentId}.pdf`,
-                content: pdfBuffer || Buffer.from(''),
-                contentType: 'application/pdf'
-              }
-            ]
+          pdfBuffer = await generateInvoicePdf({
+            invoiceId: appointment.payment?.id || paymentId,
+            patientName: appointment.patient.name,
+            patientEmail: appointment.patient.email,
+            doctorName: appointment.doctor.name,
+            appointmentDate:
+              appointmentSchedule?.startDateTime?.toISOString() ??
+              new Date().toISOString(),
+            amount: appointment.payment?.amount || 0,
+            transactionId: appointment.payment?.transactionId || '',
+            paymentDate: new Date().toISOString()
           })
 
-          console.log(`✅ Invoice email sent to ${appointment.patient.email}`)
-        } catch (emailError) {
-          console.error('❌ Error sending invoice email:', emailError)
+          const cloudinaryResponse = await uploadFileToCloudinary(
+            pdfBuffer,
+            `ph-healthcare/invoices/invoice-${paymentId}-${Date.now()}.pdf`
+          )
+
+          invoiceUrl = cloudinaryResponse?.secure_url ?? null
+
+          if (invoiceUrl) {
+            await prisma.payment.update({
+              where: { id: paymentId },
+              data: { invoiceUrl }
+            })
+          }
+
+          console.log(
+            `✅ Invoice PDF generated and uploaded for payment ${paymentId}`
+          )
+        } catch (pdfError) {
+          console.error(
+            '❌ Error generating/uploading invoice PDF:',
+            pdfError
+          )
+        }
+
+        if (invoiceUrl && pdfBuffer) {
+          try {
+            await sendEmail({
+              to: appointment.patient.email,
+              subject: `Payment Confirmation & Invoice - Appointment with ${appointment.doctor.name}`,
+              templateName: 'invoice',
+              templateData: {
+                patientName: appointment.patient.name,
+                invoiceId: appointment.payment?.id || paymentId,
+                transactionId: appointment.payment?.transactionId || '',
+                paymentDate: new Date().toLocaleDateString(),
+                doctorName: appointment.doctor.name,
+                appointmentDate:
+                  appointmentSchedule?.startDateTime?.toLocaleDateString() ??
+                  'N/A',
+                amount: appointment.payment?.amount || 0,
+                invoiceUrl
+              },
+              attachments: [
+                {
+                  filename: `Invoice-${paymentId}.pdf`,
+                  content: pdfBuffer,
+                  contentType: 'application/pdf'
+                }
+              ]
+            })
+
+            console.log(`✅ Invoice email sent to ${appointment.patient.email}`)
+          } catch (emailError) {
+            console.error('❌ Error sending invoice email:', emailError)
+          }
         }
       }
 

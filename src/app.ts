@@ -41,7 +41,7 @@ app.all('/api/auth/*splat', toNodeHandler(auth))
 
 cron.schedule('*/25 * * * *', async () => {
   try {
-    console.log(`Running corn job to cancel appointment`)
+    console.log(`Running cron job to cancel unpaid appointments`)
     await AppointmentService.cancelUnpaidAppointment()
   } catch (error) {
     console.log(error)

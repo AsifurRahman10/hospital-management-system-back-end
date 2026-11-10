@@ -373,21 +373,25 @@ const deleteDoctor = async (id: string) => {
     throw new AppError(httpStatus.NOT_FOUND, 'Doctor not found')
   }
 
-  const deletedDoctor = await prisma.doctor.update({
-    where: { id },
-    data: {
-      isDeleted: true,
-      deletedAt: new Date()
-    }
-  })
+  const deletedDoctor = await prisma.$transaction(async (tx) => {
+    const doctor = await tx.doctor.update({
+      where: { id },
+      data: {
+        isDeleted: true,
+        deletedAt: new Date()
+      }
+    })
 
-  await prisma.user.update({
-    where: { id: existingDoctor.userId },
-    data: {
-      isDeleted: true,
-      status: UserStatus.DELETED,
-      deletedAt: new Date()
-    }
+    await tx.user.update({
+      where: { id: existingDoctor.userId },
+      data: {
+        isDeleted: true,
+        status: UserStatus.DELETED,
+        deletedAt: new Date()
+      }
+    })
+
+    return doctor
   })
 
   return deletedDoctor
@@ -407,6 +411,8 @@ const getBestPerformingDoctors = async (limit = 5) => {
         }
       }
     },
+    take: targetCount * 10,
+    orderBy: [{ averageRating: 'desc' }, { createdAt: 'desc' }],
     include: {
       user: true,
       doctorSpecialties: {

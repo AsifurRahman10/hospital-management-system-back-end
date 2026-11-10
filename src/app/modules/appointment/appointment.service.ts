@@ -52,82 +52,99 @@ const bookingAppointment = async (
     }
   })
 
+  if (doctorSchedule.isBooked) {
+    throw new AppError(
+      httpStatus.CONFLICT,
+      'This schedule slot is already booked'
+    )
+  }
+
+  const appointmentFee = doctorData.appointmentFee
+  if (appointmentFee === null) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "Doctor's appointment fee has not been configured."
+    )
+  }
+
   const videoCallingId = String(uuidv7())
+  const transactionId = String(uuidv7())
 
-  const result = await prisma.$transaction(async (tx) => {
-    const appointmentData = await tx.appointment.create({
-      data: {
-        doctorId: payload.doctorId,
-        patientId: patientData.id,
-        scheduleId: doctorSchedule.scheduleId,
-        videoCallingId,
-        doctorScheduleId: doctorSchedule.scheduleId
-      }
-    })
-
-    await tx.doctorSchedules.update({
-      where: {
-        doctorId_scheduleId: {
+  const { appointmentData, paymentData } = await prisma.$transaction(
+    async (tx) => {
+      const updatedSchedule = await tx.doctorSchedules.updateMany({
+        where: {
           doctorId: payload.doctorId,
-          scheduleId: payload.scheduleId
+          scheduleId: payload.scheduleId,
+          isBooked: false
+        },
+        data: {
+          isBooked: true
         }
-      },
-      data: {
-        isBooked: true
+      })
+
+      if (updatedSchedule.count === 0) {
+        throw new AppError(
+          httpStatus.CONFLICT,
+          'This schedule slot has already been booked by another patient'
+        )
       }
-    })
 
-    // update payment table
+      const createdAppointment = await tx.appointment.create({
+        data: {
+          doctorId: payload.doctorId,
+          patientId: patientData.id,
+          scheduleId: doctorSchedule.scheduleId,
+          videoCallingId,
+          doctorScheduleId: doctorSchedule.scheduleId
+        }
+      })
 
-    const appointmentFee = doctorData.appointmentFee
+      const createdPayment = await tx.payment.create({
+        data: {
+          appointmentId: createdAppointment.id,
+          amount: appointmentFee,
+          transactionId
+        }
+      })
 
-    if (appointmentFee === null) {
-      throw new AppError(
-        httpStatus.BAD_REQUEST,
-        "Doctor's appointment fee has not been configured."
-      )
+      return {
+        appointmentData: createdAppointment,
+        paymentData: createdPayment
+      }
     }
+  )
 
-    const transactionId = String(uuidv7())
-    const paymentData = await tx.payment.create({
-      data: {
-        appointmentId: appointmentData.id,
-        amount: appointmentFee,
-        transactionId
-      }
-    })
-
-    const session = await stripe.checkout.sessions.create({
-      allowed_payment_method_types: ['card'],
-      mode: 'payment',
-      line_items: [
-        {
-          price_data: {
-            currency: 'bdt',
-            product_data: {
-              name: `Appointment with Dr. ${doctorData.name}`
-            },
-            unit_amount: appointmentFee * 100
+  const session = await stripe.checkout.sessions.create({
+    allowed_payment_method_types: ['card'],
+    mode: 'payment',
+    line_items: [
+      {
+        price_data: {
+          currency: 'bdt',
+          product_data: {
+            name: `Appointment with Dr. ${doctorData.name}`
           },
-          quantity: 1
-        }
-      ],
-      metadata: {
-        appointmentId: appointmentData.id,
-        paymentId: paymentData?.id
-      },
+          unit_amount: appointmentFee * 100
+        },
+        quantity: 1
+      }
+    ],
+    metadata: {
+      appointmentId: appointmentData.id,
+      paymentId: paymentData.id
+    },
 
-      success_url: `${envConfig.FRONTEND_URL}/dashboard/payment/payment-success?appointment_id=${appointmentData.id}&payment_id=${paymentData.id}`,
+    success_url: `${envConfig.FRONTEND_URL}/dashboard/payment/payment-success?appointment_id=${appointmentData.id}&payment_id=${paymentData.id}`,
 
-      cancel_url: `${envConfig.FRONTEND_URL}/dashboard/appointments?error=payment_cancelled`
-    })
-    return {
-      appointmentData,
-      paymentData,
-      paymentUrl: session.url
-    }
+    cancel_url: `${envConfig.FRONTEND_URL}/dashboard/appointments?error=payment_cancelled`
   })
-  return result
+
+  return {
+    appointmentData,
+    paymentData,
+    paymentUrl: session.url
+  }
 }
 
 export const appointmentFilterableFields = [
@@ -382,9 +399,43 @@ const bookAppointmentWithPayLater = async (
     }
   })
 
+  if (doctorSchedule.isBooked) {
+    throw new AppError(
+      httpStatus.CONFLICT,
+      'This schedule slot is already booked'
+    )
+  }
+
+  const appointmentFee = doctorData.appointmentFee
+  if (appointmentFee === null) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "Doctor's appointment fee has not been configured."
+    )
+  }
+
   const videoCallingId = String(uuidv7())
+  const transactionId = String(uuidv7())
 
   const result = await prisma.$transaction(async (tx) => {
+    const updatedSchedule = await tx.doctorSchedules.updateMany({
+      where: {
+        doctorId: payload.doctorId,
+        scheduleId: payload.scheduleId,
+        isBooked: false
+      },
+      data: {
+        isBooked: true
+      }
+    })
+
+    if (updatedSchedule.count === 0) {
+      throw new AppError(
+        httpStatus.CONFLICT,
+        'This schedule slot has already been booked by another patient'
+      )
+    }
+
     const appointmentData = await tx.appointment.create({
       data: {
         doctorId: payload.doctorId,
@@ -394,29 +445,6 @@ const bookAppointmentWithPayLater = async (
         doctorScheduleId: doctorSchedule.scheduleId
       }
     })
-
-    await tx.doctorSchedules.update({
-      where: {
-        doctorId_scheduleId: {
-          doctorId: payload.doctorId,
-          scheduleId: payload.scheduleId
-        }
-      },
-      data: {
-        isBooked: true
-      }
-    })
-
-    const transactionId = String(uuidv7())
-
-    const appointmentFee = doctorData.appointmentFee
-
-    if (appointmentFee === null) {
-      throw new AppError(
-        httpStatus.BAD_REQUEST,
-        "Doctor's appointment fee has not been configured."
-      )
-    }
 
     const paymentData = await tx.payment.create({
       data: {
@@ -520,9 +548,16 @@ const cancelUnpaidAppointment = async () => {
       createdAt: {
         lte: thirtyMinutesAgo
       },
-      paymentStatus: PaymentStatus.UNPAID
+      paymentStatus: PaymentStatus.UNPAID,
+      status: {
+        not: AppointmentStatus.CANCELED
+      }
     }
   })
+
+  if (unpaidAppointments.length === 0) {
+    return
+  }
 
   const appointmentToCancel = unpaidAppointments.map(
     (appointment) => appointment.id
