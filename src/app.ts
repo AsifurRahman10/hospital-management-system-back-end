@@ -10,9 +10,14 @@ import qs from 'qs'
 import { PaymentController } from './app/modules/payment/payment.controller'
 import cron from 'node-cron'
 import { AppointmentService } from './app/modules/appointment/appointment.service'
+import {
+  authRateLimiter,
+  globalRateLimiter
+} from './app/middleware/rateLimiter'
 
 const app: Application = express()
 
+app.set('trust proxy', 1)
 app.set('query parser', (str: string) => qs.parse(str))
 
 app.post(
@@ -37,7 +42,7 @@ app.use(
 // Enable URL-encoded form data parsing
 app.use(express.urlencoded({ extended: true }))
 
-app.all('/api/auth/*splat', toNodeHandler(auth))
+app.all('/api/auth/*splat', authRateLimiter, toNodeHandler(auth))
 
 cron.schedule('*/25 * * * *', async () => {
   try {
@@ -55,7 +60,7 @@ app.get('/', (req: Request, res: Response) => {
   res.send('Hello, TypeScript + Express!')
 })
 
-app.use('/api/v1', router)
+app.use('/api/v1', globalRateLimiter, router)
 
 app.use(globalErrorHandler)
 app.use(notFound)
