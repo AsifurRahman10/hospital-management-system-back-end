@@ -129,6 +129,9 @@ const getAllDoctorSchedules = async (query: IQueryParams) => {
     .paginate()
     .dynamicInclude(doctorScheduleIncludeConfig)
     .sort()
+    .include({
+      schedule: true
+    })
     .execute()
 
   return result
