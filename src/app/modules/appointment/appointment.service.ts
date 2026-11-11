@@ -135,9 +135,9 @@ const bookingAppointment = async (
       paymentId: paymentData.id
     },
 
-    success_url: `${envConfig.FRONTEND_URL}/dashboard/payment/payment-success?appointment_id=${appointmentData.id}&payment_id=${paymentData.id}`,
+    success_url: `${envConfig.FRONTEND_URL}/dashboard/my-appointments?payment=success&appointment_id=${appointmentData.id}&payment_id=${paymentData.id}`,
 
-    cancel_url: `${envConfig.FRONTEND_URL}/dashboard/appointments?error=payment_cancelled`
+    cancel_url: `${envConfig.FRONTEND_URL}/dashboard/my-appointments?error=payment_cancelled`
   })
 
   return {
@@ -198,6 +198,11 @@ const getMyAppointments = async (query: IQueryParams, user: IUser) => {
     .paginate()
     .sort()
     .fields()
+    .include({
+      doctor: true,
+      schedule: true,
+      patient: true
+    })
     .execute()
 }
 
@@ -356,7 +361,8 @@ const getAllAppointments = async (query: Record<string, unknown>) => {
 
   queryBuilder.filter().sort().paginate().fields().include({
     doctor: true,
-    patient: true
+    patient: true,
+    schedule: true
   })
 
   return queryBuilder.execute()
@@ -530,9 +536,9 @@ const initiatePayment = async (appointmentId: string, user: IUser) => {
       paymentId: appointmentData.payment?.id
     },
 
-    success_url: `${envConfig.FRONTEND_URL}/dashboard/payment/payment-success?appointment_id=${appointmentData.id}&payment_id=${appointmentData.payment.id}`,
+    success_url: `${envConfig.FRONTEND_URL}/dashboard/my-appointments?payment=success&appointment_id=${appointmentData.id}&payment_id=${appointmentData.payment.id}`,
 
-    cancel_url: `${envConfig.FRONTEND_URL}/dashboard/appointments?error=payment_cancelled`
+    cancel_url: `${envConfig.FRONTEND_URL}/dashboard/my-appointments?error=payment_cancelled`
   })
 
   return {

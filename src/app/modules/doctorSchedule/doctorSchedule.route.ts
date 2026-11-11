@@ -15,6 +15,7 @@ router.get(
   checkAuth(Role.DOCTOR),
   DoctorScheduleController.getDoctorWiseAllSchedule
 )
+
 router.get(
   '/',
   checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
@@ -24,6 +25,11 @@ router.get(
   '/:doctorId/schedule/:scheduleId',
   checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
   DoctorScheduleController.getDoctorScheduleById
+)
+router.get(
+  '/:doctorId',
+  checkAuth(Role.PATIENT),
+  DoctorScheduleController.getDoctorSchedulesByDoctorId
 )
 router.patch(
   '/update-own-doctor-schedule',
