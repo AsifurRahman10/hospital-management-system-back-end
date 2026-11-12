@@ -10,11 +10,8 @@ interface TEnvVars {
   BETTER_AUTH_URL: string
   NODE_ENV?: string
   EMAIL_SENDER: {
-    EMAIL_SENDER_SMTP_USER: string
-    EMAIL_SENDER_SMTP_PASS: string
-    EMAIL_SENDER_SMTP_HOST: string
-    EMAIL_SENDER_SMTP_PORT: string
-    EMAIL_SENDER_SMTP_FROM: string
+    RESEND_API_KEY: string
+    RESEND_EMAIL_SENDER_FROM: string
   }
   GOOGLE_CLIENT_ID: string
   GOOGLE_CLIENT_SECRET: string
@@ -41,11 +38,8 @@ const envVars = (): TEnvVars => {
     'BETTER_AUTH_SECRET',
     'BETTER_AUTH_URL',
     'NODE_ENV',
-    'EMAIL_SENDER_SMTP_USER',
-    'EMAIL_SENDER_SMTP_PASS',
-    'EMAIL_SENDER_SMTP_HOST',
-    'EMAIL_SENDER_SMTP_PORT',
-    'EMAIL_SENDER_SMTP_FROM',
+    'RESEND_API_KEY',
+    'RESEND_EMAIL_SENDER_FROM',
     'GOOGLE_CLIENT_ID',
     'GOOGLE_CLIENT_SECRET',
     'GOOGLE_CALLBACK_URL',
@@ -97,11 +91,8 @@ const envVars = (): TEnvVars => {
     BETTER_AUTH_URL: process.env.BETTER_AUTH_URL as string,
     NODE_ENV: process.env.NODE_ENV as string,
     EMAIL_SENDER: {
-      EMAIL_SENDER_SMTP_USER: process.env.EMAIL_SENDER_SMTP_USER as string,
-      EMAIL_SENDER_SMTP_PASS: process.env.EMAIL_SENDER_SMTP_PASS as string,
-      EMAIL_SENDER_SMTP_HOST: process.env.EMAIL_SENDER_SMTP_HOST as string,
-      EMAIL_SENDER_SMTP_PORT: process.env.EMAIL_SENDER_SMTP_PORT as string,
-      EMAIL_SENDER_SMTP_FROM: process.env.EMAIL_SENDER_SMTP_FROM as string
+      RESEND_API_KEY: process.env.RESEND_API_KEY as string,
+      RESEND_EMAIL_SENDER_FROM: process.env.RESEND_EMAIL_SENDER_FROM as string
     },
     GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID as string,
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET as string,
