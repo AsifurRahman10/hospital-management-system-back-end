@@ -74,17 +74,22 @@ const getMe = async (userId: string) => {
     include: {
       patient: {
         include: {
-          appointments: true
-          // reviews: true
-          // prescriptions: true
+          _count: {
+            select: {
+              appointments: true
+            }
+          }
         }
       },
       doctor: {
         include: {
           doctorSpecialties: true,
-          appointments: true
-          // reviews: true,
-          // prescriptions: true
+          _count: {
+            select: {
+              appointments: true,
+              reviews: true
+            }
+          }
         }
       },
       admin: true
@@ -94,6 +99,7 @@ const getMe = async (userId: string) => {
   if (!isUserExist) {
     throw new AppError(httpStatus.NOT_FOUND, 'User not found')
   }
+
   return isUserExist
 }
 
@@ -294,6 +300,48 @@ const resetPassword = async (
   })
 }
 
+const getSession = async (headers: Headers) => {
+  const sessionData = await auth.api.getSession({ headers })
+
+  if (!sessionData) {
+    throw new AppError(httpStatus.UNAUTHORIZED, 'No active session found')
+  }
+
+  return sessionData
+}
+
+const sendVerificationEmail = async (email: string) => {
+  const user = await prisma.user.findUnique({
+    where: {
+      email
+    }
+  })
+
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found')
+  }
+
+  if (user.emailVerified) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Email is already verified')
+  }
+
+  await auth.api.sendVerificationOTP({
+    body: {
+      email,
+      type: 'email-verification'
+    }
+  })
+
+  await prisma.user.update({
+    where: {
+      email
+    },
+    data: {
+      emailVerified: false
+    }
+  })
+}
+
 export const AuthServices = {
   registerPatient,
   loginUser,
@@ -303,5 +351,7 @@ export const AuthServices = {
   logout,
   verifyEmail,
   forgetPassword,
-  resetPassword
+  resetPassword,
+  getSession,
+  sendVerificationEmail
 }

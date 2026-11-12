@@ -41,7 +41,11 @@ const givePrescription = async (
       patient: true,
       doctor: {
         include: {
-          doctorSpecialties: true
+          doctorSpecialties: {
+            include: {
+              specialty: true
+            }
+          }
         }
       },
       schedule: true
@@ -69,86 +73,84 @@ const givePrescription = async (
 
   const followUpDate = new Date(payload.followUpDate)
 
-  const result = await prisma.$transaction(
-    async (tx) => {
-      const result = await tx.prescription.create({
-        data: {
-          ...payload,
-          followUpDate,
-          doctorId: appointmentData.doctorId,
-          patientId: appointmentData.patientId
-        }
-      })
-
-      const pdfBuffer = await generatePrescriptionPDF({
-        doctorName: doctorData.name,
-        patientName: appointmentData.patient.name,
-        appointmentDate: appointmentData.schedule.startDateTime,
-        instructions: payload.instructions,
-        followUpDate,
-        doctorEmail: doctorData.email,
-        patientEmail: appointmentData.patient.email,
-        prescriptionId: result.id,
-        createdAt: new Date()
-      })
-
-      const fileName = `Prescription-${Date.now()}.pdf`
-      const uploadedFile = await uploadFileToCloudinary(pdfBuffer, fileName)
-      const pdfUrl = uploadedFile.secure_url
-
-      const updatedPrescription = await tx.prescription.update({
-        where: {
-          id: result.id
-        },
-        data: {
-          pdfUrl
-        }
-      })
-
-      try {
-        const patient = appointmentData.patient
-        const doctor = appointmentData.doctor
-
-        await sendEmail({
-          to: patient.email,
-          subject: `You have received a new prescription from Dr. ${doctor.name}`,
-          templateName: 'prescription',
-          templateData: {
-            doctorName: doctor.name,
-            patientName: patient.name,
-            specialization: doctor.doctorSpecialties
-              .map((s: any) => s.title)
-              .join(', '),
-            appointmentDate: new Date(
-              appointmentData.schedule.startDateTime
-            ).toLocaleString(),
-            issuedDate: new Date().toLocaleDateString(),
-            prescriptionId: result.id,
-            instructions: payload.instructions,
-            followUpDate: followUpDate.toLocaleDateString(),
-            pdfUrl: pdfUrl
-          },
-          attachments: [
-            {
-              filename: fileName,
-              content: pdfBuffer,
-              contentType: 'application/pdf'
-            }
-          ]
-        })
-      } catch (error) {
-        console.log('Failed To send email notification for prescription', error)
-      }
-
-      return updatedPrescription
-    },
-    {
-      maxWait: 15000,
-      timeout: 20000
+  // 1. Fast database create without holding long-lived transaction locks
+  const createdPrescription = await prisma.prescription.create({
+    data: {
+      ...payload,
+      followUpDate,
+      doctorId: appointmentData.doctorId,
+      patientId: appointmentData.patientId
     }
-  )
+  })
 
-  return result
+  // 2. Generate PDF, upload, and send email outside transaction
+  try {
+    const pdfBuffer = await generatePrescriptionPDF({
+      doctorName: doctorData.name,
+      patientName: appointmentData.patient.name,
+      appointmentDate: appointmentData.schedule.startDateTime,
+      instructions: payload.instructions,
+      followUpDate,
+      doctorEmail: doctorData.email,
+      patientEmail: appointmentData.patient.email,
+      prescriptionId: createdPrescription.id,
+      createdAt: new Date()
+    })
+
+    const fileName = `Prescription-${Date.now()}.pdf`
+    const uploadedFile = await uploadFileToCloudinary(pdfBuffer, fileName)
+    const pdfUrl = uploadedFile.secure_url
+
+    const updatedPrescription = await prisma.prescription.update({
+      where: {
+        id: createdPrescription.id
+      },
+      data: {
+        pdfUrl
+      }
+    })
+
+    try {
+      const patient = appointmentData.patient
+      const doctor = appointmentData.doctor
+
+      await sendEmail({
+        to: patient.email,
+        subject: `You have received a new prescription from Dr. ${doctor.name}`,
+        templateName: 'prescription',
+        templateData: {
+          doctorName: doctor.name,
+          patientName: patient.name,
+          specialization: doctor.doctorSpecialties
+            .map((s: any) => s.specialty?.title)
+            .filter(Boolean)
+            .join(', '),
+          appointmentDate: new Date(
+            appointmentData.schedule.startDateTime
+          ).toLocaleString(),
+          issuedDate: new Date().toLocaleDateString(),
+          prescriptionId: createdPrescription.id,
+          instructions: payload.instructions,
+          followUpDate: followUpDate.toLocaleDateString(),
+          pdfUrl: pdfUrl
+        },
+        attachments: [
+          {
+            filename: fileName,
+            content: pdfBuffer,
+            contentType: 'application/pdf'
+          }
+        ]
+      })
+    } catch (error) {
+      console.log('Failed to send email notification for prescription', error)
+    }
+
+    return updatedPrescription
+  } catch (pdfError) {
+    console.error('Error generating or uploading prescription PDF:', pdfError)
+    return createdPrescription
+  }
 }
 
 interface PrescriptionData {
@@ -174,7 +176,7 @@ const generatePrescriptionPDF = async (
         bufferPages: true,
         info: {
           Title: `Prescription ${prescriptionData.prescriptionId}`,
-          Author: 'PH Healthcare Services',
+          Author: 'Life Hospital Services',
           Subject: 'Medical Prescription'
         }
       })
@@ -264,7 +266,7 @@ const generatePrescriptionPDF = async (
         .font('Helvetica-Bold')
         .fontSize(19)
         .fillColor(colors.white)
-        .text('PH Healthcare', margin, 32)
+        .text('Life Hospital', margin, 32)
 
       doc
         .font('Helvetica')
@@ -536,7 +538,7 @@ const generatePrescriptionPDF = async (
         .font('Helvetica-Bold')
         .fontSize(9)
         .fillColor(colors.dark)
-        .text('PH Healthcare Services', margin, footerY + 14, {
+        .text('Life Hospital Services', margin, footerY + 14, {
           width: contentWidth,
           align: 'center'
         })

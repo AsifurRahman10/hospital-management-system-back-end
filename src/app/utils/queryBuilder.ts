@@ -167,8 +167,8 @@ export class QueryBuilder<
             unknown
           >
 
-          queryRelation[nestedField] = this.parseFilterValue(value)
-          countRelation[nestedField] = this.parseFilterValue(value)
+          queryRelation[nestedField] = this.parseFilterValue(value, nestedField)
+          countRelation[nestedField] = this.parseFilterValue(value, nestedField)
           return
         } else if (parts.length === 3) {
           const [relation, nestedRelation, nestedField] = parts
@@ -215,8 +215,14 @@ export class QueryBuilder<
             unknown
           >
 
-          queryNestedRelation[nestedField] = this.parseFilterValue(value)
-          countNestedRelation[nestedField] = this.parseFilterValue(value)
+          queryNestedRelation[nestedField] = this.parseFilterValue(
+            value,
+            nestedField
+          )
+          countNestedRelation[nestedField] = this.parseFilterValue(
+            value,
+            nestedField
+          )
 
           return
         }
@@ -241,8 +247,8 @@ export class QueryBuilder<
       }
 
       //direct value parsing
-      queryWhere[key] = this.parseFilterValue(value)
-      countQueryWhere[key] = this.parseFilterValue(value)
+      queryWhere[key] = this.parseFilterValue(value, key)
+      countQueryWhere[key] = this.parseFilterValue(value, key)
     })
     return this
   }
@@ -455,7 +461,7 @@ export class QueryBuilder<
     return result
   }
 
-  private parseFilterValue(value: unknown): unknown {
+  private parseFilterValue(value: unknown, key?: string): unknown {
     if (value === 'true') {
       return true
     }
@@ -463,12 +469,21 @@ export class QueryBuilder<
       return false
     }
 
-    if (typeof value === 'string' && !isNaN(Number(value)) && value != '') {
-      return Number(value)
+    if (Array.isArray(value)) {
+      return { in: value.map((item) => this.parseFilterValue(item, key)) }
     }
 
-    if (Array.isArray(value)) {
-      return { in: value.map((item) => this.parseFilterValue(item)) }
+    // Only coerce to number for known numeric fields, preserving string codes, phone numbers, and IDs
+    if (
+      key &&
+      ['appointmentFee', 'experience', 'amount', 'rating', 'price'].includes(
+        key
+      ) &&
+      typeof value === 'string' &&
+      !isNaN(Number(value)) &&
+      value.trim() !== ''
+    ) {
+      return Number(value)
     }
 
     return value

@@ -5,11 +5,17 @@ import sendResponse from '../../shared/sendResponse'
 import httpStatus from 'http-status'
 import { DoctorService } from './doctor.service'
 import { IUser } from '../../interface'
+import { Role } from '../../../../generated/prisma/enums'
 
 const getAllDoctors = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const query = req.query
-    const data = await DoctorService.getAllDoctors(query)
+    const includeInactiveDoctors =
+      req.user?.role === Role.ADMIN || req.user?.role === Role.SUPER_ADMIN
+    const data = await DoctorService.getAllDoctors(
+      query,
+      includeInactiveDoctors
+    )
 
     sendResponse(res, {
       statusCode: httpStatus.OK,
@@ -79,9 +85,24 @@ const updateMyProfile = catchAsync(async (req: Request, res: Response) => {
   })
 })
 
+const getBestPerformingDoctors = catchAsync(
+  async (req: Request, res: Response) => {
+    const limit = req.query.limit ? Number(req.query.limit) : 5
+    const data = await DoctorService.getBestPerformingDoctors(limit)
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'Best performing doctors retrieved successfully',
+      data
+    })
+  }
+)
+
 export const DoctorController = {
   getAllDoctors,
   getDoctorById,
+  getBestPerformingDoctors,
   updateDoctor,
   deleteDoctor,
   updateMyProfile

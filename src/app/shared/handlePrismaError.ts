@@ -123,6 +123,20 @@ export const handlePrismaClientKnownRequestError = (
   const statusCode = getStatusCodeFromPrismaError(error.code)
   const metaInfo = formatErrorMeta(error.meta)
 
+  if (error.code === 'P2002') {
+    return {
+      success: false,
+      statusCode,
+      message: 'A record with the same unique value already exists.',
+      errorSources: [
+        {
+          path: error.code,
+          message: metaInfo || 'Duplicate value for a unique field.'
+        }
+      ]
+    }
+  }
+
   let cleanMessage = error.message
 
   // Remove the "Invalid `prisma.user.create()` invocation: " part from the message for better readability

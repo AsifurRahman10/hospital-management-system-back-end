@@ -28,29 +28,40 @@ const getDashboardStatsData = async (user: IUser) => {
 }
 
 const getSuperAdminStatsData = async () => {
-  const appointmentCount = await prisma.appointment.count()
-  const doctorCount = await prisma.doctor.count()
-  const patientCount = await prisma.patient.count()
-  const superAdminCount = await prisma.admin.count({
-    where: {
-      user: {
-        role: Role.SUPER_ADMIN
+  const [
+    appointmentCount,
+    doctorCount,
+    patientCount,
+    superAdminCount,
+    adminCount,
+    paymentCount,
+    userCount,
+    totalRevenue,
+    pieChartData,
+    barChartData
+  ] = await Promise.all([
+    prisma.appointment.count(),
+    prisma.doctor.count(),
+    prisma.patient.count(),
+    prisma.admin.count({
+      where: {
+        user: {
+          role: Role.SUPER_ADMIN
+        }
       }
-    }
-  })
-  const adminCount = await prisma.admin.count()
-  const paymentCount = await prisma.payment.count()
-  const userCount = await prisma.user.count()
-
-  const totalRevenue = await prisma.payment.aggregate({
-    _sum: { amount: true },
-    where: {
-      status: PaymentStatus.PAID
-    }
-  })
-
-  const pieChartData = await getPieChartData()
-  const barChartData = await getBarChartData()
+    }),
+    prisma.admin.count(),
+    prisma.payment.count(),
+    prisma.user.count(),
+    prisma.payment.aggregate({
+      _sum: { amount: true },
+      where: {
+        status: PaymentStatus.PAID
+      }
+    }),
+    getPieChartData(),
+    getBarChartData()
+  ])
 
   return {
     appointmentCount,
@@ -67,22 +78,32 @@ const getSuperAdminStatsData = async () => {
 }
 
 const getAdminStatsData = async () => {
-  const appointmentCount = await prisma.appointment.count()
-  const doctorCount = await prisma.doctor.count()
-  const patientCount = await prisma.patient.count()
-  const paymentCount = await prisma.payment.count()
-  const userCount = await prisma.user.count()
-  const adminCount = await prisma.admin.count()
-
-  const totalRevenue = await prisma.payment.aggregate({
-    _sum: { amount: true },
-    where: {
-      status: PaymentStatus.PAID
-    }
-  })
-
-  const pieChartData = await getPieChartData()
-  const barChartData = await getBarChartData()
+  const [
+    appointmentCount,
+    doctorCount,
+    patientCount,
+    paymentCount,
+    userCount,
+    adminCount,
+    totalRevenue,
+    pieChartData,
+    barChartData
+  ] = await Promise.all([
+    prisma.appointment.count(),
+    prisma.doctor.count(),
+    prisma.patient.count(),
+    prisma.payment.count(),
+    prisma.user.count(),
+    prisma.admin.count(),
+    prisma.payment.aggregate({
+      _sum: { amount: true },
+      where: {
+        status: PaymentStatus.PAID
+      }
+    }),
+    getPieChartData(),
+    getBarChartData()
+  ])
 
   return {
     appointmentCount,

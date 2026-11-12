@@ -99,6 +99,20 @@ const verifyEmail = catchAsync(async (req: Request, res: Response) => {
   })
 })
 
+const sendVerificationEmail = catchAsync(
+  async (req: Request, res: Response) => {
+    const { email } = req.body
+
+    await AuthServices.sendVerificationEmail(email)
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'Email verified successfully'
+    })
+  }
+)
+
 const forgetPassword = catchAsync(async (req: Request, res: Response) => {
   const { email } = req.body
 
@@ -131,7 +145,7 @@ const getGoogleErrorRedirect = (redirectPath: string) => {
 
 const googleLogin = catchAsync(async (req: Request, res: Response) => {
   const redirectPath = (req.query.redirect as string) || '/dashboard'
-  const frontendUrl = new URL(envConfig.FRONTEND_URL)
+  // const frontendUrl = new URL(envConfig.FRONTEND_URL)
 
   if (!redirectPath.startsWith('/') || redirectPath.startsWith('//')) {
     res.status(httpStatus.BAD_REQUEST).json({
@@ -211,6 +225,19 @@ const googleLoginError = catchAsync(async (req: Request, res: Response) => {
   res.redirect(getGoogleErrorRedirect(redirectPath))
 })
 
+const getSession = catchAsync(async (req: Request, res: Response) => {
+  const sessionData = await AuthServices.getSession(
+    fromNodeHeaders(req.headers)
+  )
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Session retrieved successfully',
+    data: sessionData
+  })
+})
+
 export const AuthController = {
   registerPatient,
   loginUser,
@@ -222,5 +249,7 @@ export const AuthController = {
   resetPassword,
   googleLogin,
   googleLoginSuccess,
-  googleLoginError
+  googleLoginError,
+  getSession,
+  sendVerificationEmail
 }

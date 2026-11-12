@@ -13,7 +13,8 @@ export const auth = betterAuth({
   baseURL: envConfig.BETTER_AUTH_URL,
   secret: envConfig.BETTER_AUTH_SECRET,
   emailAndPassword: {
-    enabled: true
+    enabled: true,
+    requireEmailVerification: true
   },
   emailVerification: {
     sendOnSignIn: true,

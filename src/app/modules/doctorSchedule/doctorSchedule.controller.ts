@@ -74,6 +74,24 @@ const getDoctorScheduleById = catchAsync(
   }
 )
 
+const getDoctorSchedulesByDoctorId = catchAsync(
+  async (req: Request, res: Response) => {
+    const { doctorId } = req.params
+    const query = req.query
+    const result = await DoctorScheduleService.getDoctorSchedulesByDoctorId(
+      doctorId as string,
+      query as IQueryParams
+    )
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: 'Doctor schedules retrieved successfully',
+      data: result.data,
+      meta: result.meta
+    })
+  }
+)
+
 const updateOwnDoctorSchedule = catchAsync(
   async (req: Request, res: Response) => {
     const payload = req.body
@@ -113,6 +131,7 @@ export const DoctorScheduleController = {
   getDoctorWiseAllSchedule,
   getAllDoctorSchedules,
   getDoctorScheduleById,
+  getDoctorSchedulesByDoctorId,
   updateOwnDoctorSchedule,
   deleteOwnDoctorSchedule
 }

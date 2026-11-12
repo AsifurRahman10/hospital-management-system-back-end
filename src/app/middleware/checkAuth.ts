@@ -66,4 +66,39 @@ const checkAuth = (...allowedRoles: Role[]) => {
   }
 }
 
+export const optionalCheckAuth = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const sessionData = await auth.api.getSession({
+      headers: fromNodeHeaders(req.headers)
+    })
+
+    if (!sessionData) {
+      return next()
+    }
+
+    const user = await prisma.user.findUnique({
+      where: {
+        email: sessionData.user.email
+      }
+    })
+
+    if (user && user.status === UserStatus.ACTIVE && !user.isDeleted) {
+      req.user = {
+        id: user.id,
+        role: user.role,
+        email: user.email
+      }
+      req.session = sessionData.session
+    }
+
+    next()
+  } catch (error) {
+    next(error)
+  }
+}
+
 export default checkAuth

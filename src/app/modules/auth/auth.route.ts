@@ -6,8 +6,13 @@ import { Role } from '../../../../generated/prisma/enums'
 const router = Router()
 
 router.post('/register', AuthController.registerPatient)
-router.get('/login', AuthController.loginUser)
+router.post('/login', AuthController.loginUser)
 router.get('/me', checkAuth(...Object.values(Role)), AuthController.getMe)
+router.get(
+  '/get-session',
+  checkAuth(...Object.values(Role)),
+  AuthController.getSession
+)
 
 router.post(
   '/change-password',
@@ -16,6 +21,7 @@ router.post(
 )
 
 router.post('/logout', checkAuth(...Object.values(Role)), AuthController.logout)
+router.post('/resend-verification-email', AuthController.sendVerificationEmail)
 router.post('/verify-email', AuthController.verifyEmail)
 router.post('/forget-password', AuthController.forgetPassword)
 router.post('/reset-password', AuthController.resetPassword)
