@@ -123,7 +123,11 @@ export const auth = betterAuth({
   account: {
     storeStateStrategy: 'cookie'
   },
-  trustedOrigins: [envConfig.FRONTEND_URL],
+  trustedOrigins: [
+    envConfig.FRONTEND_URL,
+    'http://localhost:3000',
+    'http://127.0.0.1:3000'
+  ],
   advanced: {
     useSecureCookies: envConfig.NODE_ENV === 'production',
     cookies: {
