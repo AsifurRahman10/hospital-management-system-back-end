@@ -15,62 +15,79 @@ const createSchedule = async (payload: ICreateSchedulePayload) => {
   const { startDate, endDate, startTime, endTime } = payload
 
   const interval = 30
-
   const currentDate = new Date(startDate)
   const lastDate = new Date(endDate)
 
-  const schedules = []
+  const allSlots: { startDateTime: Date; endDateTime: Date }[] = []
 
   while (currentDate <= lastDate) {
-    const startDateTime = new Date(
-      addMinutes(
-        addHours(
-          `${format(currentDate, 'yyyy-MM-dd')}`,
-          Number(startTime.split(':')[0])
-        ),
-        Number(startTime.split(':')[1])
-      )
-    )
+    const dayStr = format(currentDate, 'yyyy-MM-dd')
+    const startHour = Number(startTime.split(':')[0])
+    const startMin = Number(startTime.split(':')[1])
+    const endHour = Number(endTime.split(':')[0])
+    const endMin = Number(endTime.split(':')[1])
 
-    const endDateTime = new Date(
-      addMinutes(
-        addHours(
-          `${format(currentDate, 'yyyy-MM-dd')}`,
-          Number(endTime.split(':')[0])
-        ),
-        Number(endTime.split(':')[1])
-      )
-    )
+    let slotStart = addMinutes(addHours(new Date(dayStr), startHour), startMin)
+    const dayEnd = addMinutes(addHours(new Date(dayStr), endHour), endMin)
 
-    while (startDateTime < endDateTime) {
-      const s = await convertDateTime(startDateTime)
-      const e = await convertDateTime(addMinutes(startDateTime, interval))
-
-      const scheduleData = {
-        startDateTime: s,
-        endDateTime: e
-      }
-
-      const existingSchedule = await prisma.schedule.findFirst({
-        where: {
-          startDateTime: scheduleData.startDateTime,
-          endDateTime: scheduleData.endDateTime
-        }
+    while (slotStart < dayEnd) {
+      const slotEnd = addMinutes(slotStart, interval)
+      allSlots.push({
+        startDateTime: slotStart,
+        endDateTime: slotEnd
       })
-
-      if (!existingSchedule) {
-        const result = await prisma.schedule.create({
-          data: scheduleData
-        })
-        schedules.push(result)
-      }
-
-      startDateTime.setMinutes(startDateTime.getMinutes() + interval)
+      slotStart = slotEnd
     }
 
     currentDate.setDate(currentDate.getDate() + 1)
   }
-  return schedules
+
+  if (allSlots.length === 0) {
+    return []
+  }
+
+  // Batch query to find already existing schedules
+  const existingSchedules = await prisma.schedule.findMany({
+    where: {
+      OR: allSlots.map((slot) => ({
+        startDateTime: slot.startDateTime,
+        endDateTime: slot.endDateTime
+      }))
+    }
+  })
+
+  const existingSet = new Set(
+    existingSchedules.map(
+      (s) => `${s.startDateTime.getTime()}_${s.endDateTime.getTime()}`
+    )
+  )
+
+  const newSlots = allSlots.filter(
+    (slot) =>
+      !existingSet.has(
+        `${slot.startDateTime.getTime()}_${slot.endDateTime.getTime()}`
+      )
+  )
+
+  if (newSlots.length > 0) {
+    await prisma.schedule.createMany({
+      data: newSlots
+    })
+  }
+
+  const result = await prisma.schedule.findMany({
+    where: {
+      OR: allSlots.map((slot) => ({
+        startDateTime: slot.startDateTime,
+        endDateTime: slot.endDateTime
+      }))
+    },
+    orderBy: {
+      startDateTime: 'asc'
+    }
+  })
+
+  return result
 }
 
 export const scheduleFilterableFields = ['id', 'startDateTime', 'endDateTime']
@@ -175,11 +192,6 @@ const deleteSchedule = async (id: string) => {
     }
   })
   return true
-}
-
-const convertDateTime = async (date: Date) => {
-  const offset = date.getTimezoneOffset() * 60000
-  return new Date(date.getTime() + offset)
 }
 
 export const ScheduleService = {

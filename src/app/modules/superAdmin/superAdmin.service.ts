@@ -1,9 +1,15 @@
+import { Role } from '../../../../generated/prisma/enums'
 import { prisma } from '../../lib/prisma'
 import AppError from '../../shared/AppError'
 import httpStatus from 'http-status'
 
 const getAllSuperAdmins = async () => {
-  const allSuperAdmins = await prisma.superAdmin.findMany({
+  const allSuperAdmins = await prisma.admin.findMany({
+    where: {
+      user: {
+        role: Role.SUPER_ADMIN
+      }
+    },
     include: {
       user: true
     }
@@ -13,10 +19,13 @@ const getAllSuperAdmins = async () => {
 }
 
 const getSuperAdminById = async (id: string) => {
-  const superAdmin = await prisma.superAdmin.findFirst({
+  const superAdmin = await prisma.admin.findFirst({
     where: {
       id,
-      isDeleted: false
+      isDeleted: false,
+      user: {
+        role: Role.SUPER_ADMIN
+      }
     },
     include: {
       user: true
@@ -38,10 +47,13 @@ interface UpdateSuperAdminPayload {
 }
 
 const updateSuperAdmin = async (payload: UpdateSuperAdminPayload) => {
-  const existingSuperAdmin = await prisma.superAdmin.findFirst({
+  const existingSuperAdmin = await prisma.admin.findFirst({
     where: {
       id: payload.id,
-      isDeleted: false
+      isDeleted: false,
+      user: {
+        role: Role.SUPER_ADMIN
+      }
     }
   })
 
@@ -51,7 +63,7 @@ const updateSuperAdmin = async (payload: UpdateSuperAdminPayload) => {
 
   const { id, ...superAdminData } = payload
 
-  const updatedSuperAdmin = await prisma.superAdmin.update({
+  const updatedSuperAdmin = await prisma.admin.update({
     where: { id },
     data: superAdminData,
     include: {
@@ -63,10 +75,13 @@ const updateSuperAdmin = async (payload: UpdateSuperAdminPayload) => {
 }
 
 const deleteSuperAdmin = async (id: string) => {
-  const existingSuperAdmin = await prisma.superAdmin.findFirst({
+  const existingSuperAdmin = await prisma.admin.findFirst({
     where: {
       id,
-      isDeleted: false
+      isDeleted: false,
+      user: {
+        role: Role.SUPER_ADMIN
+      }
     }
   })
 
@@ -74,7 +89,7 @@ const deleteSuperAdmin = async (id: string) => {
     throw new AppError(httpStatus.NOT_FOUND, 'Super admin not found')
   }
 
-  const deletedSuperAdmin = await prisma.superAdmin.update({
+  const deletedSuperAdmin = await prisma.admin.update({
     where: { id },
     data: {
       isDeleted: true,
