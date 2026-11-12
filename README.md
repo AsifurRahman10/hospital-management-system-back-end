@@ -39,15 +39,15 @@ The codebase is written in **TypeScript** using **Express.js v5**, **Prisma ORM*
 
 ### Live Links
 
-| Resource | Link |
-|---|---|
+| Resource           | Link                                         |
+| ------------------ | -------------------------------------------- |
 | Postman Collection | `HMS.postman_collection.json` (in repo root) |
-| API Testing Guide | `API_TESTING_GUIDE.md` (in repo root) |
-
+| API Testing Guide  | `API_TESTING_GUIDE.md` (in repo root)        |
 
 ## Features
 
 ### 🔐 Authentication & Authorization
+
 - **Email/password registration & login** via Better Auth
 - **Email OTP verification** (sign-up & sign-in) with 6-digit codes expiring in 2 minutes
 - **Password reset** via email OTP (forget-password / reset-password flow)
@@ -57,6 +57,7 @@ The codebase is written in **TypeScript** using **Express.js v5**, **Prisma ORM*
 - Account status management (ACTIVE, BLOCK, DELETED) and soft-delete (`isDeleted` / `deletedAt`)
 
 ### 👥 User Management
+
 - Patient self-registration
 - Doctor registration (with specialties, qualifications, fees, etc.) — Super Admin only
 - Admin & Super Admin creation — Super Admin only
@@ -65,12 +66,14 @@ The codebase is written in **TypeScript** using **Express.js v5**, **Prisma ORM*
 - Super Admin bootstrapped automatically on server start via seed script
 
 ### 🏥 Doctor & Specialty Management
+
 - Medical specialties CRUD (with icon upload)
 - Doctor profiles linked to specialties (many-to-many via `DoctorSpecialty`)
 - Public doctor listing with search, filter, pagination, and sorting
 - Doctor profile details including appointments, schedules, prescriptions, and reviews
 
 ### 📅 Appointment Scheduling
+
 - Admin/SuperAdmin creates time-slot schedules (30-minute intervals)
 - Doctors claim schedules for themselves (doctor-wise schedules)
 - Patients book appointments against available doctor schedules
@@ -81,6 +84,7 @@ The codebase is written in **TypeScript** using **Express.js v5**, **Prisma ORM*
 - Video calling ID generated per appointment
 
 ### 💳 Payments (Stripe)
+
 - Stripe Checkout integration (BDT currency)
 - Stripe webhook (`/webhook`) handles `checkout.session.completed`
 - Automatic payment status update + invoice PDF generation
@@ -88,6 +92,7 @@ The codebase is written in **TypeScript** using **Express.js v5**, **Prisma ORM*
 - Idempotent webhook processing (skips already-processed events)
 
 ### 📄 Prescriptions
+
 - Doctors create prescriptions for their own appointments
 - Auto-generated PDF via **pdfkit**, uploaded to Cloudinary
 - Prescription emailed to patient with PDF attachment
@@ -95,21 +100,25 @@ The codebase is written in **TypeScript** using **Express.js v5**, **Prisma ORM*
 - Admins/SuperAdmins can list all prescriptions
 
 ### ⭐ Reviews & Ratings
+
 - Patients review doctors after a **paid** appointment (one review per appointment)
 - Doctors can view reviews received for their appointments
 - Automatic doctor average-rating recalculation on create/update/delete
 - Patients can update/delete their own reviews
 
 ### 👤 Patient Profiles
+
 - Patient health data (blood group, allergies, diabetes, height, weight, smoking, pregnancy, mental health, immunization, surgeries, marital status, etc.)
 - Medical reports (name + link, uploadable to Cloudinary)
 - Profile photo uploads
 
 ### 📊 Dashboard Statistics
+
 - Role-aware stats: Super Admin, Admin, Doctor, Patient each see different metrics
 - Counts (appointments, doctors, patients, admins, users, payments), total revenue, pie/bar chart data
 
 ### 📧 Email (Nodemailer + EJS)
+
 - OTP verification emails
 - Password reset emails
 - Prescription delivery emails (with PDF attachment)
@@ -117,6 +126,7 @@ The codebase is written in **TypeScript** using **Express.js v5**, **Prisma ORM*
 - EJS templates in `src/app/templates/`
 
 ### ☁️ File Storage (Cloudinary)
+
 - Profile photos (doctors, admins, patients)
 - Medical report documents
 - Prescription & invoice PDFs
@@ -124,37 +134,54 @@ The codebase is written in **TypeScript** using **Express.js v5**, **Prisma ORM*
 - Automatic cleanup of orphaned uploads on error via global error handler
 
 ### ⏱️ Background Jobs
-- `node-cron` runs every 25 minutes: cancels appointments unpaid for >30 minutes and frees doctor schedules
 
+- `node-cron` runs every 25 minutes: cancels appointments unpaid for >30 minutes and frees doctor schedules
 
 ## Tech Stack
 
-| Layer | Technology | Version |
-|---|---|---|
-| Runtime | Node.js | 26.x |
-| Language | TypeScript | 6.x (via `@typescript/typescript6`) |
-| Web Framework | Express.js | 5.x |
-| Package Manager | pnpm | 12.6.0 |
-| ORM | Prisma | 7.10.0 |
-| Database | PostgreSQL | — |
-| Authentication | Better Auth | 1.7.6 |
-| Validation | Zod | 4.6.5 |
-| Payments | Stripe | 23.x |
-| File Storage | Cloudinary | 2.11.0 |
-| Email Transport | Nodemailer | 10.1.0 |
-| Email Templates | EJS | 7.0.1 |
-| PDF Generation | pdfkit | 0.20.2 |
-| Date Utilities | date-fns | 4.4.0 |
-| UUID | uuid | 14.x |
-| Cron Scheduling | node-cron | 4.6.0 |
-| Query Parsing | qs | 6.16.0 |
-| HTTP Status Codes | http-status | 2.1.0 |
-| Linter | ESLint | 10.x |
-| Dev Server | tsx | 4.23.x |
+| Layer             | Technology  | Version                             |
+| ----------------- | ----------- | ----------------------------------- |
+| Runtime           | Node.js     | 26.x                                |
+| Language          | TypeScript  | 6.x (via `@typescript/typescript6`) |
+| Web Framework     | Express.js  | 5.x                                 |
+| Package Manager   | pnpm        | 12.6.0                              |
+| ORM               | Prisma      | 7.10.0                              |
+| Database          | PostgreSQL  | —                                   |
+| Authentication    | Better Auth | 1.7.6                               |
+| Validation        | Zod         | 4.6.5                               |
+| Payments          | Stripe      | 23.x                                |
+| File Storage      | Cloudinary  | 2.11.0                              |
+| Email Transport   | Nodemailer  | 10.1.0                              |
+| Email Templates   | EJS         | 7.0.1                               |
+| PDF Generation    | pdfkit      | 0.20.2                              |
+| Date Utilities    | date-fns    | 4.4.0                               |
+| UUID              | uuid        | 14.x                                |
+| Cron Scheduling   | node-cron   | 4.6.0                               |
+| Query Parsing     | qs          | 6.16.0                              |
+| HTTP Status Codes | http-status | 2.1.0                               |
+| Linter            | ESLint      | 10.x                                |
+| Dev Server        | tsx         | 4.23.x                              |
 
 **Dev Engines:** `pnpm@12.6.0` (enforced via `devEngines` with `onFail: download`)
 
 ## Architecture
+
+### Docker with Neon
+
+Docker Compose uses Neon as the database; it does not start a local PostgreSQL container. Put your Neon connection string and the other required application variables in `.env`, then run:
+
+```bash
+docker compose up --build
+```
+
+The API is available at `http://localhost:5000`. The source directory is mounted into the development container, so changes are picked up by `tsx watch`. Compose runs pending Prisma migrations against Neon when the container starts.
+
+For a production image, build and run the `production` stage. Supply the same `.env` file at runtime so migrations can connect to Neon:
+
+```bash
+docker build --target production -t hms-backend .
+docker run --env-file .env -p 5000:5000 hms-backend
+```
 
 ```
 hms-backend/
@@ -187,22 +214,22 @@ hms-backend/
 
 Each module follows a consistent pattern: `route.ts` → `controller.ts` → `service.ts` → `validation.ts` (+ optional `middlewares.ts`).
 
-| Module | Responsibility |
-|---|---|
-| `auth` | Patient register/login, me, change-password, logout, email verify, forget/reset password, Google OAuth |
-| `specialty` | Medical specialty CRUD (icon upload via Cloudinary) |
-| `user` | Doctor registration, Admin/SuperAdmin creation (Super Admin gated) |
-| `doctor` | Doctor listing (search/filter/paginate), detail, update, delete, self-profile update |
-| `admin` | Admin CRUD, self-profile, change user status, change user role |
-| `superAdmin` | Super Admin CRUD |
-| `schedule` | Time-slot schedule generation (30-min intervals) |
-| `doctorSchedule` | Doctors claim/release schedules for themselves |
-| `appointment` | Book appointment, pay-later, initiate Stripe payment, status change, list appointments |
-| `patient` | Patient profile + health data + medical reports update |
-| `review` | Doctor reviews (create/read/update/delete) with rating aggregation |
-| `prescription` | Prescription CRUD with PDF generation & email |
-| `payment` | Stripe webhook handler |
-| `stats` | Role-aware dashboard statistics |
+| Module           | Responsibility                                                                                         |
+| ---------------- | ------------------------------------------------------------------------------------------------------ |
+| `auth`           | Patient register/login, me, change-password, logout, email verify, forget/reset password, Google OAuth |
+| `specialty`      | Medical specialty CRUD (icon upload via Cloudinary)                                                    |
+| `user`           | Doctor registration, Admin/SuperAdmin creation (Super Admin gated)                                     |
+| `doctor`         | Doctor listing (search/filter/paginate), detail, update, delete, self-profile update                   |
+| `admin`          | Admin CRUD, self-profile, change user status, change user role                                         |
+| `superAdmin`     | Super Admin CRUD                                                                                       |
+| `schedule`       | Time-slot schedule generation (30-min intervals)                                                       |
+| `doctorSchedule` | Doctors claim/release schedules for themselves                                                         |
+| `appointment`    | Book appointment, pay-later, initiate Stripe payment, status change, list appointments                 |
+| `patient`        | Patient profile + health data + medical reports update                                                 |
+| `review`         | Doctor reviews (create/read/update/delete) with rating aggregation                                     |
+| `prescription`   | Prescription CRUD with PDF generation & email                                                          |
+| `payment`        | Stripe webhook handler                                                                                 |
+| `stats`          | Role-aware dashboard statistics                                                                        |
 
 ### Request Flow
 
@@ -244,6 +271,7 @@ Client Request
 ```
 
 ### Error Handling
+
 - **Global error handler** (`globalErrorHandler.ts`) catches all errors, maps Prisma error codes (P2002 → 409, P2025 → 404, etc.), strips verbose Prisma messages, includes stack traces in development only.
 - **`catchAsync`** wrapper ensures async route handler errors propagate to the global handler instead of crashing the process.
 - **`AppError`** class for custom HTTP errors with status codes.
@@ -264,7 +292,7 @@ All successful responses follow this shape:
 
 Error responses:
 
-```json
+````json
 {
   "success": false,
   "message": "Human readable error message",
@@ -309,19 +337,39 @@ pnpm dev                  # uses tsx watch on src/server.ts
 # 6. Build for production
 pnpm build                # tsc → dist/
 pnpm start                # node dist/server.js
+````
+
+### Docker Development
+
+Docker Compose runs the API with hot reload and a local PostgreSQL database. The source directory is mounted into the API container, so changes made on the host are picked up by `tsx watch`.
+
+```bash
+# 1. Create the environment file and fill in the application secrets
+cp .env.example .env   # if .env.example exists; otherwise create .env manually
+
+# 2. Start the API and PostgreSQL
+docker compose up --build
+
+# Stop the containers (database data is retained)
+docker compose down
+
+# Stop the containers and delete the local database volume
+docker compose down -v
 ```
+
+The API is available at `http://localhost:5000`. The Compose file overrides `DATABASE_URL` inside the API container to use the `db` service, while the other required variables are loaded from `.env`.
 
 ### Available Scripts
 
-| Script | Description |
-|---|---|
-| `pnpm dev` | Start dev server with `tsx watch` (hot reload) |
-| `pnpm start` | Start production server from `dist/` |
-| `pnpm build` | Compile TypeScript to `dist/` |
-| `pnpm typecheck` | Run `tsc --noEmit` for type checking |
-| `pnpm lint` | Run ESLint on `./src` |
-| `pnpm prisma:migrate` | Run `prisma migrate dev` |
-| `pnpm stripe` | Forward Stripe webhooks locally to `localhost:5000/webhook` |
+| Script                | Description                                                 |
+| --------------------- | ----------------------------------------------------------- |
+| `pnpm dev`            | Start dev server with `tsx watch` (hot reload)              |
+| `pnpm start`          | Start production server from `dist/`                        |
+| `pnpm build`          | Compile TypeScript to `dist/`                               |
+| `pnpm typecheck`      | Run `tsc --noEmit` for type checking                        |
+| `pnpm lint`           | Run ESLint on `./src`                                       |
+| `pnpm prisma:migrate` | Run `prisma migrate dev`                                    |
+| `pnpm stripe`         | Forward Stripe webhooks locally to `localhost:5000/webhook` |
 
 ### First-Time Setup (Super Admin)
 
@@ -385,151 +433,152 @@ SUPER_ADMIN_PASSWORD=12345678
 All API routes are mounted under `/api/v1`. Authentication uses **session cookies** (set by Better Auth / login endpoints) — clients must include cookies on every authenticated request. A Postman collection (`HMS.postman_collection.json`) is included in the repo root.
 
 ### Base URL
+
 ```
 http://localhost:5000/api/v1
 ```
 
 ### 1. Authentication (`/api/v1/auth`)
 
-| Method | Endpoint | Auth | Description |
-|---|---|---|---|
-| POST | `/register` | Public | Register a new patient (email/password) |
-| GET | `/login` | Public | Login (returns Set-Cookie session) |
-| GET | `/me` | Any role | Get current user profile |
-| POST | `/change-password` | Any role | Change password (blocked for Google accounts) |
-| POST | `/logout` | Any role | Log out (clear session cookie) |
-| POST | `/verify-email` | Public | Verify email with OTP |
-| POST | `/forget-password` | Public | Request password-reset OTP |
-| POST | `/reset-password` | Public | Reset password with OTP |
-| GET | `/login/google` | Public | Initiate Google OAuth |
-| GET | `/google/success` | Public | Google OAuth success callback |
-| GET | `/google/error` | Public | Google OAuth error callback |
+| Method | Endpoint           | Auth     | Description                                   |
+| ------ | ------------------ | -------- | --------------------------------------------- |
+| POST   | `/register`        | Public   | Register a new patient (email/password)       |
+| GET    | `/login`           | Public   | Login (returns Set-Cookie session)            |
+| GET    | `/me`              | Any role | Get current user profile                      |
+| POST   | `/change-password` | Any role | Change password (blocked for Google accounts) |
+| POST   | `/logout`          | Any role | Log out (clear session cookie)                |
+| POST   | `/verify-email`    | Public   | Verify email with OTP                         |
+| POST   | `/forget-password` | Public   | Request password-reset OTP                    |
+| POST   | `/reset-password`  | Public   | Reset password with OTP                       |
+| GET    | `/login/google`    | Public   | Initiate Google OAuth                         |
+| GET    | `/google/success`  | Public   | Google OAuth success callback                 |
+| GET    | `/google/error`    | Public   | Google OAuth error callback                   |
 
 > **Note:** Login is `GET` with a JSON body in this implementation. Keep cookies between requests (Postman: use the same tab/collection with cookies enabled).
 
 ### 2. Specialties (`/api/v1/specialty`)
 
-| Method | Endpoint | Auth | Description |
-|---|---|---|---|
-| POST | `/` | ADMIN, SUPER_ADMIN | Create specialty (icon image upload) |
-| GET | `/` | Public | List all specialties |
-| GET | `/:id` | Public | Get single specialty |
-| PATCH | `/:id` | (controller) | Update specialty |
-| DELETE | `/:id` | (controller) | Soft-delete specialty |
+| Method | Endpoint | Auth               | Description                          |
+| ------ | -------- | ------------------ | ------------------------------------ |
+| POST   | `/`      | ADMIN, SUPER_ADMIN | Create specialty (icon image upload) |
+| GET    | `/`      | Public             | List all specialties                 |
+| GET    | `/:id`   | Public             | Get single specialty                 |
+| PATCH  | `/:id`   | (controller)       | Update specialty                     |
+| DELETE | `/:id`   | (controller)       | Soft-delete specialty                |
 
 ### 3. User Management (`/api/v1/user`)
 
-| Method | Endpoint | Auth | Description |
-|---|---|---|---|
-| POST | `/register-doctor` | Public | Register a doctor (creates User + Doctor + DoctorSpecialties) |
-| POST | `/create-admin` | SUPER_ADMIN | Create an admin |
-| POST | `/create-super-admin` | SUPER_ADMIN | Create a super admin |
+| Method | Endpoint              | Auth        | Description                                                   |
+| ------ | --------------------- | ----------- | ------------------------------------------------------------- |
+| POST   | `/register-doctor`    | Public      | Register a doctor (creates User + Doctor + DoctorSpecialties) |
+| POST   | `/create-admin`       | SUPER_ADMIN | Create an admin                                               |
+| POST   | `/create-super-admin` | SUPER_ADMIN | Create a super admin                                          |
 
 ### 4. Doctors (`/api/v1/doctor`)
 
-| Method | Endpoint | Auth | Description |
-|---|---|---|---|
-| GET | `/` | Public | List doctors (search, filter, paginate, sort) |
-| GET | `/:id` | Public | Get doctor by ID |
-| PATCH | `/:id` | (controller) | Update doctor |
-| DELETE | `/:id` | (controller) | Soft-delete doctor |
-| PATCH | `/update-my-profile` | DOCTOR | Update own profile (photo upload) |
+| Method | Endpoint             | Auth         | Description                                   |
+| ------ | -------------------- | ------------ | --------------------------------------------- |
+| GET    | `/`                  | Public       | List doctors (search, filter, paginate, sort) |
+| GET    | `/:id`               | Public       | Get doctor by ID                              |
+| PATCH  | `/:id`               | (controller) | Update doctor                                 |
+| DELETE | `/:id`               | (controller) | Soft-delete doctor                            |
+| PATCH  | `/update-my-profile` | DOCTOR       | Update own profile (photo upload)             |
 
 ### 5. Admins (`/api/v1/admin`)
 
-| Method | Endpoint | Auth | Description |
-|---|---|---|---|
-| GET | `/` | ADMIN, SUPER_ADMIN | List all admins |
-| GET | `/:id` | ADMIN, SUPER_ADMIN | Get admin by ID |
-| PATCH | `/:id` | SUPER_ADMIN | Update admin |
-| DELETE | `/:id` | ADMIN, SUPER_ADMIN | Soft-delete admin |
-| PATCH | `/update-my-profile` | ADMIN, SUPER_ADMIN | Update own profile |
-| PATCH | `/change-user-status` | ADMIN, SUPER_ADMIN | Block/activate a user |
-| PATCH | `/change-user-role` | SUPER_ADMIN | Change user role (Admin↔SuperAdmin) |
+| Method | Endpoint              | Auth               | Description                         |
+| ------ | --------------------- | ------------------ | ----------------------------------- |
+| GET    | `/`                   | ADMIN, SUPER_ADMIN | List all admins                     |
+| GET    | `/:id`                | ADMIN, SUPER_ADMIN | Get admin by ID                     |
+| PATCH  | `/:id`                | SUPER_ADMIN        | Update admin                        |
+| DELETE | `/:id`                | ADMIN, SUPER_ADMIN | Soft-delete admin                   |
+| PATCH  | `/update-my-profile`  | ADMIN, SUPER_ADMIN | Update own profile                  |
+| PATCH  | `/change-user-status` | ADMIN, SUPER_ADMIN | Block/activate a user               |
+| PATCH  | `/change-user-role`   | SUPER_ADMIN        | Change user role (Admin↔SuperAdmin) |
 
 ---
 
 ### 6. Super Admins (`/api/v1/super-admin`)
 
-| Method | Endpoint | Auth | Description |
-|---|---|---|---|
-| GET | `/` | SUPER_ADMIN | List all super admins |
-| GET | `/:id` | SUPER_ADMIN | Get super admin by ID |
-| PATCH | `/:id` | SUPER_ADMIN | Update super admin |
-| DELETE | `/:id` | SUPER_ADMIN | Soft-delete super admin |
+| Method | Endpoint | Auth        | Description             |
+| ------ | -------- | ----------- | ----------------------- |
+| GET    | `/`      | SUPER_ADMIN | List all super admins   |
+| GET    | `/:id`   | SUPER_ADMIN | Get super admin by ID   |
+| PATCH  | `/:id`   | SUPER_ADMIN | Update super admin      |
+| DELETE | `/:id`   | SUPER_ADMIN | Soft-delete super admin |
 
 ### 7. Schedules (`/api/v1/schedule`)
 
-| Method | Endpoint | Auth | Description |
-|---|---|---|---|
-| POST | `/` | ADMIN, SUPER_ADMIN | Create time-slot schedules (30-min intervals) |
-| GET | `/` | ADMIN, SUPER_ADMIN, DOCTOR | List schedules |
-| GET | `/:id` | ADMIN, SUPER_ADMIN, DOCTOR | Get schedule by ID |
-| PATCH | `/:id` | ADMIN, SUPER_ADMIN | Update schedule |
-| DELETE | `/:id` | ADMIN, SUPER_ADMIN | Delete schedule |
+| Method | Endpoint | Auth                       | Description                                   |
+| ------ | -------- | -------------------------- | --------------------------------------------- |
+| POST   | `/`      | ADMIN, SUPER_ADMIN         | Create time-slot schedules (30-min intervals) |
+| GET    | `/`      | ADMIN, SUPER_ADMIN, DOCTOR | List schedules                                |
+| GET    | `/:id`   | ADMIN, SUPER_ADMIN, DOCTOR | Get schedule by ID                            |
+| PATCH  | `/:id`   | ADMIN, SUPER_ADMIN         | Update schedule                               |
+| DELETE | `/:id`   | ADMIN, SUPER_ADMIN         | Delete schedule                               |
 
 ### 8. Doctor Schedules (`/api/v1/doctorSchedule`)
 
-| Method | Endpoint | Auth | Description |
-|---|---|---|---|
-| POST | `/create-doctor-wise-schedule` | DOCTOR | Claim schedules for this doctor |
-| GET | `/doctor-wise-schedules` | DOCTOR | List this doctor's schedules |
-| GET | `/` | ADMIN, SUPER_ADMIN | List all doctor schedules |
-| GET | `/:doctorId/schedule/:scheduleId` | ADMIN, SUPER_ADMIN | Get specific doctor schedule |
-| PATCH | `/update-own-doctor-schedule` | DOCTOR | Update own doctor schedules |
-| DELETE | `/delete-own-doctor-schedule/:id` | DOCTOR | Delete own doctor schedule |
+| Method | Endpoint                          | Auth               | Description                     |
+| ------ | --------------------------------- | ------------------ | ------------------------------- |
+| POST   | `/create-doctor-wise-schedule`    | DOCTOR             | Claim schedules for this doctor |
+| GET    | `/doctor-wise-schedules`          | DOCTOR             | List this doctor's schedules    |
+| GET    | `/`                               | ADMIN, SUPER_ADMIN | List all doctor schedules       |
+| GET    | `/:doctorId/schedule/:scheduleId` | ADMIN, SUPER_ADMIN | Get specific doctor schedule    |
+| PATCH  | `/update-own-doctor-schedule`     | DOCTOR             | Update own doctor schedules     |
+| DELETE | `/delete-own-doctor-schedule/:id` | DOCTOR             | Delete own doctor schedule      |
 
 ---
 
 ### 9. Appointments (`/api/v1/appointment`)
 
-| Method | Endpoint | Auth | Description |
-|---|---|---|---|
-| POST | `/book-appointment` | PATIENT | Book appointment + create Stripe Checkout |
-| GET | `/my-appointments` | PATIENT, DOCTOR | List own appointments |
-| PATCH | `/change-appointment-status/:id` | PATIENT, DOCTOR, ADMIN, SUPER_ADMIN | Change status |
-| GET | `/my-single-appointment/:id` | PATIENT, DOCTOR | Get single appointment |
-| GET | `/all-appointments` | ADMIN, SUPER_ADMIN | List all appointments |
-| POST | `/book-appointment-with-pay-later` | PATIENT | Book without immediate payment |
-| POST | `/initiate-payment/:id` | PATIENT | Create Stripe Checkout for existing appointment |
+| Method | Endpoint                           | Auth                                | Description                                     |
+| ------ | ---------------------------------- | ----------------------------------- | ----------------------------------------------- |
+| POST   | `/book-appointment`                | PATIENT                             | Book appointment + create Stripe Checkout       |
+| GET    | `/my-appointments`                 | PATIENT, DOCTOR                     | List own appointments                           |
+| PATCH  | `/change-appointment-status/:id`   | PATIENT, DOCTOR, ADMIN, SUPER_ADMIN | Change status                                   |
+| GET    | `/my-single-appointment/:id`       | PATIENT, DOCTOR                     | Get single appointment                          |
+| GET    | `/all-appointments`                | ADMIN, SUPER_ADMIN                  | List all appointments                           |
+| POST   | `/book-appointment-with-pay-later` | PATIENT                             | Book without immediate payment                  |
+| POST   | `/initiate-payment/:id`            | PATIENT                             | Create Stripe Checkout for existing appointment |
 
 ### 10. Patient (`/api/v1/patient`)
 
-| Method | Endpoint | Auth | Description |
-|---|---|---|---|
-| PATCH | `/update-my-profile` | PATIENT | Update profile, health data, medical reports (photo + up to 5 report files) |
+| Method | Endpoint             | Auth    | Description                                                                 |
+| ------ | -------------------- | ------- | --------------------------------------------------------------------------- |
+| PATCH  | `/update-my-profile` | PATIENT | Update profile, health data, medical reports (photo + up to 5 report files) |
 
 ### 11. Reviews (`/api/v1/review`)
 
-| Method | Endpoint | Auth | Description |
-|---|---|---|---|
-| GET | `/` | Public | List all reviews |
-| POST | `/` | PATIENT | Create review (requires paid appointment) |
-| GET | `/my-reviews` | PATIENT, DOCTOR | List own reviews |
-| PATCH | `/:id` | PATIENT | Update own review |
-| DELETE | `/:id` | PATIENT | Delete own review |
+| Method | Endpoint      | Auth            | Description                               |
+| ------ | ------------- | --------------- | ----------------------------------------- |
+| GET    | `/`           | Public          | List all reviews                          |
+| POST   | `/`           | PATIENT         | Create review (requires paid appointment) |
+| GET    | `/my-reviews` | PATIENT, DOCTOR | List own reviews                          |
+| PATCH  | `/:id`        | PATIENT         | Update own review                         |
+| DELETE | `/:id`        | PATIENT         | Delete own review                         |
 
 ### 12. Prescriptions (`/api/v1/prescription`)
 
-| Method | Endpoint | Auth | Description |
-|---|---|---|---|
-| GET | `/` | ADMIN, SUPER_ADMIN | List all prescriptions |
-| GET | `/my-prescriptions` | PATIENT, DOCTOR | List own prescriptions |
-| POST | `/` | DOCTOR | Create prescription (generates PDF + emails patient) |
-| PATCH | `/:id` | DOCTOR | Update prescription (regenerates PDF + emails) |
-| DELETE | `/:id` | DOCTOR | Delete prescription |
+| Method | Endpoint            | Auth               | Description                                          |
+| ------ | ------------------- | ------------------ | ---------------------------------------------------- |
+| GET    | `/`                 | ADMIN, SUPER_ADMIN | List all prescriptions                               |
+| GET    | `/my-prescriptions` | PATIENT, DOCTOR    | List own prescriptions                               |
+| POST   | `/`                 | DOCTOR             | Create prescription (generates PDF + emails patient) |
+| PATCH  | `/:id`              | DOCTOR             | Update prescription (regenerates PDF + emails)       |
+| DELETE | `/:id`              | DOCTOR             | Delete prescription                                  |
 
 ### 13. Statistics (`/api/v1/stats`)
 
-| Method | Endpoint | Auth | Description |
-|---|---|---|---|
-| GET | `/` | Any role | Dashboard stats (role-aware metrics) |
+| Method | Endpoint | Auth     | Description                          |
+| ------ | -------- | -------- | ------------------------------------ |
+| GET    | `/`      | Any role | Dashboard stats (role-aware metrics) |
 
 ### 14. Stripe Webhook
 
-| Method | Endpoint | Auth | Description |
-|---|---|---|---|
-| POST | `/webhook` | Public (Stripe signature verified) | Handles `checkout.session.completed` — updates payment, generates invoice PDF, emails patient |
+| Method | Endpoint   | Auth                               | Description                                                                                   |
+| ------ | ---------- | ---------------------------------- | --------------------------------------------------------------------------------------------- |
+| POST   | `/webhook` | Public (Stripe signature verified) | Handles `checkout.session.completed` — updates payment, generates invoice PDF, emails patient |
 
 > The webhook is mounted directly in `app.ts` (not under `/api/v1`) at `POST /webhook` with `express.raw()` body parsing.
 
@@ -580,37 +629,38 @@ erDiagram
 
 ### Key Models
 
-| Model | Description |
-|---|---|
-| `user` | Core identity: email, role, status, needPasswordChange, isDeleted, timestamps |
-| `session` / `account` / `verification` | Better Auth tables (sessions, OAuth accounts, email verification) |
-| `specialty` | Medical specialty (title, description, icon, soft-delete) |
-| `doctor` | Doctor profile linked to `user` (name, email, photo, contact, address, registration number, experience, fee, qualifications, workplace, designation, averageRating) |
-| `doctorSpecialty` | Junction: doctor ↔ specialty |
-| `admin` / `super_admin` | Role-specific profiles linked to `user` (soft-delete) |
-| `patient` | Patient profile linked to `user` |
-| `patientHealthData` | Rich health profile (blood group, allergies, vitals, pregnancy, mental health, etc.) |
-| `medicalReport` | Patient medical reports (name, link) |
-| `schedule` | Generic time slot (startDateTime, endDateTime) |
-| `doctorSchedules` | Junction: doctor + schedule + isBooked flag |
-| `appointment` | Booking: patient + doctor + schedule, videoCallingId, status, paymentStatus |
-| `payment` | Stripe payment: amount, transactionId, invoiceUrl, status (PAID/UNPAID) |
-| `review` | Rating 1–5 + comment, unique per appointment |
-| `prescription` | Instructions + followUpDate + pdfUrl, unique per appointment |
+| Model                                  | Description                                                                                                                                                         |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `user`                                 | Core identity: email, role, status, needPasswordChange, isDeleted, timestamps                                                                                       |
+| `session` / `account` / `verification` | Better Auth tables (sessions, OAuth accounts, email verification)                                                                                                   |
+| `specialty`                            | Medical specialty (title, description, icon, soft-delete)                                                                                                           |
+| `doctor`                               | Doctor profile linked to `user` (name, email, photo, contact, address, registration number, experience, fee, qualifications, workplace, designation, averageRating) |
+| `doctorSpecialty`                      | Junction: doctor ↔ specialty                                                                                                                                        |
+| `admin` / `super_admin`                | Role-specific profiles linked to `user` (soft-delete)                                                                                                               |
+| `patient`                              | Patient profile linked to `user`                                                                                                                                    |
+| `patientHealthData`                    | Rich health profile (blood group, allergies, vitals, pregnancy, mental health, etc.)                                                                                |
+| `medicalReport`                        | Patient medical reports (name, link)                                                                                                                                |
+| `schedule`                             | Generic time slot (startDateTime, endDateTime)                                                                                                                      |
+| `doctorSchedules`                      | Junction: doctor + schedule + isBooked flag                                                                                                                         |
+| `appointment`                          | Booking: patient + doctor + schedule, videoCallingId, status, paymentStatus                                                                                         |
+| `payment`                              | Stripe payment: amount, transactionId, invoiceUrl, status (PAID/UNPAID)                                                                                             |
+| `review`                               | Rating 1–5 + comment, unique per appointment                                                                                                                        |
+| `prescription`                         | Instructions + followUpDate + pdfUrl, unique per appointment                                                                                                        |
 
 ### Enums
 
-| Enum | Values |
-|---|---|
-| `Role` | SUPER_ADMIN, ADMIN, PATIENT, DOCTOR |
-| `UserStatus` | ACTIVE, BLOCK, DELETED |
-| `AppointmentStatus` | SCHEDULED, INPROGRESS, COMPLETED, CANCELED |
-| `PaymentStatus` | PAID, UNPAID |
-| `BloodGroup` | A_POSITIVE, A_NEGATIVE, B_POSITIVE, B_NEGATIVE, AB_POSITIVE, AB_NEGATIVE, O_POSITIVE, O_NEGATIVE |
-| `MaritalStatus` | MARRIED, UNMARRIED, DIVORCED, WIDOWED |
-| `Gender` | MALE, FEMALE, OTHER |
+| Enum                | Values                                                                                           |
+| ------------------- | ------------------------------------------------------------------------------------------------ |
+| `Role`              | SUPER_ADMIN, ADMIN, PATIENT, DOCTOR                                                              |
+| `UserStatus`        | ACTIVE, BLOCK, DELETED                                                                           |
+| `AppointmentStatus` | SCHEDULED, INPROGRESS, COMPLETED, CANCELED                                                       |
+| `PaymentStatus`     | PAID, UNPAID                                                                                     |
+| `BloodGroup`        | A_POSITIVE, A_NEGATIVE, B_POSITIVE, B_NEGATIVE, AB_POSITIVE, AB_NEGATIVE, O_POSITIVE, O_NEGATIVE |
+| `MaritalStatus`     | MARRIED, UNMARRIED, DIVORCED, WIDOWED                                                            |
+| `Gender`            | MALE, FEMALE, OTHER                                                                              |
 
 ### Indexing Strategy
+
 - `user(email)` — unique
 - `specialty(title)`, `specialty(isDeleted)` — query performance
 - `session(token)` unique, `session(userId)`
@@ -626,20 +676,24 @@ erDiagram
 ## Authentication & Security
 
 ### Authentication Provider
+
 **Better Auth** (`better-auth`) with the Prisma adapter (`@prisma/adapter-pg` + `pg`). Session state is stored in cookies (not JWT), providing automatic revocation on logout/password-change.
 
 ### Auth Strategies
+
 1. **Email + Password** — `emailAndPassword: { enabled: true }`
 2. **Email OTP** — verification OTPs sent on sign-up and sign-in; 6-digit codes, 2-minute expiry. Super Admins skip OTP emails.
 3. **Google OAuth** — social login; Google accounts are patient-only and cannot change/reset passwords.
 
 ### Session Configuration
+
 - `useSecureCookies`: `true` only in production
 - `sameSite`: `lax` (dev) / `none` (prod)
 - `httpOnly: true`, `path: '/'`
 - Trusted origins: `FRONTEND_URL`
 
 ### Authorization Middleware (`checkAuth`)
+
 - Validates the Better Auth session from request headers (`fromNodeHeaders`)
 - Loads the `User` record from the database
 - Rejects if account is `BLOCK`, `DELETED`, or `isDeleted`
@@ -647,21 +701,25 @@ erDiagram
 - Attaches `req.user` (`{ id, role, email }`) and `req.session` for downstream use
 
 ### Password Security
+
 - Passwords are hashed by Better Auth (bcrypt)
 - `needPasswordChange` flag forces new users/admins to change password on first login
 - Google accounts are exempt from password operations
 
 ### CSRF / CORS
+
 - CORS configured with explicit origins: `FRONTEND_URL`, `BETTER_AUTH_URL`, `http://localhost:3000`
 - `credentials: true` to allow cookies cross-origin
 - Allowed methods: GET, POST, PUT, DELETE, PATCH
 
 ### Input Validation
+
 - **Zod schemas** validate every request body via `validateRequest` middleware
 - Sanitizes nested `body.data` JSON-string payloads (FormData compatibility)
 - Global error handler converts Zod issues into structured `errorSources`
 
 ### Secrets Management
+
 - All secrets live in `.env` (gitignored): `BETTER_AUTH_SECRET`, SMTP credentials, Stripe keys, Cloudinary secret, Google OAuth secret
 - `envConfig` throws at startup if any required variable is missing — fails fast instead of runtime surprises
 
@@ -676,6 +734,7 @@ There is **no automated test suite** configured (`"test": "echo \"Error: no test
 The repo includes `HMS.postman_collection.json`. Import it into Postman and set the `localurl` variable to `http://localhost:5000/`.
 
 **Recommended test flow:**
+
 1. `POST /api/v1/auth/register` — register a patient
 2. `GET /api/v1/auth/login` — login (save cookies)
 3. `POST /api/v1/auth/verify-email` — verify with OTP
@@ -724,6 +783,7 @@ No `Dockerfile` or `docker-compose.yml` is present in the repository. Containeri
 ### CI/CD
 
 No GitHub Actions or CI configuration is present. Recommended additions:
+
 - Lint on PR (`pnpm lint`)
 - Typecheck (`pnpm typecheck`)
 - Migration check (`pnpm prisma migrate dev` against a test DB)
@@ -732,20 +792,20 @@ No GitHub Actions or CI configuration is present. Recommended additions:
 
 ## Future Improvements
 
-| Area | Suggested Improvement |
-|---|---|
-| **Testing** | Add unit/integration tests (Vitest or Jest + Supertest) |
-| **Type Safety** | Replace `npm:@typescript/typescript6` with stable TypeScript 5.x |
-| **Containerization** | Add `Dockerfile` + `docker-compose.yml` |
-| **CI/CD** | GitHub Actions workflow for lint, typecheck, and migrations |
-| **API Docs** | Add Swagger/OpenAPI (e.g., `swagger-ui-express`) |
-| **Rate Limiting** | Add `express-rate-limit` on auth endpoints |
-| **Pagination Consistency** | Some list endpoints (e.g., specialty) lack pagination |
+| Area                        | Suggested Improvement                                                          |
+| --------------------------- | ------------------------------------------------------------------------------ |
+| **Testing**                 | Add unit/integration tests (Vitest or Jest + Supertest)                        |
+| **Type Safety**             | Replace `npm:@typescript/typescript6` with stable TypeScript 5.x               |
+| **Containerization**        | Add `Dockerfile` + `docker-compose.yml`                                        |
+| **CI/CD**                   | GitHub Actions workflow for lint, typecheck, and migrations                    |
+| **API Docs**                | Add Swagger/OpenAPI (e.g., `swagger-ui-express`)                               |
+| **Rate Limiting**           | Add `express-rate-limit` on auth endpoints                                     |
+| **Pagination Consistency**  | Some list endpoints (e.g., specialty) lack pagination                          |
 | **Soft-Delete Consistency** | Some list endpoints don't filter `isDeleted` (noted in `API_TESTING_GUIDE.md`) |
-| **File Validation** | Add file type/size limits for Cloudinary uploads |
-| **Appointment Reminders** | Email/SMS reminders before scheduled appointments |
-| **Doctor Availability** | Real-time availability checking instead of static slots |
-| **Pagination Meta** | Ensure all paginated endpoints return consistent `meta` |
+| **File Validation**         | Add file type/size limits for Cloudinary uploads                               |
+| **Appointment Reminders**   | Email/SMS reminders before scheduled appointments                              |
+| **Doctor Availability**     | Real-time availability checking instead of static slots                        |
+| **Pagination Meta**         | Ensure all paginated endpoints return consistent `meta`                        |
 
 ## Author
 
@@ -755,5 +815,4 @@ Repository: [hospital-management-system-back-end](https://github.com/AsifurRahma
 
 ## License
 
-ISC License — see `package.json` for details.
----
+## ISC License — see `package.json` for details.
