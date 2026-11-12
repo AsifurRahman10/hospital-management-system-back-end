@@ -18,9 +18,9 @@ FROM dependencies AS build
 
 COPY tsconfig.json prisma7.config.ts ./
 COPY prisma ./prisma
-COPY generated ./generated
 COPY src ./src
 
+RUN pnpm exec prisma generate
 RUN pnpm build
 
 FROM dependencies AS development
