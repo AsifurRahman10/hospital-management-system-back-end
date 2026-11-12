@@ -137,15 +137,34 @@ const resetPassword = catchAsync(async (req: Request, res: Response) => {
   })
 })
 
-const getGoogleErrorRedirect = (redirectPath: string) => {
-  const redirectUrl = new URL(redirectPath, envConfig.FRONTEND_URL)
+const resolveFrontendOrigin = (rawOrigin?: string): string => {
+  if (rawOrigin) {
+    try {
+      const origin = new URL(rawOrigin).origin
+      if (envConfig.ALLOWED_FRONTEND_ORIGINS.includes(origin)) {
+        return origin
+      }
+    } catch {
+      // Fall back to configured FRONTEND_URL when origin is malformed
+    }
+  }
+
+  return new URL(envConfig.FRONTEND_URL).origin
+}
+
+const getGoogleErrorRedirect = (
+  redirectPath: string,
+  frontendOrigin: string
+) => {
+  const redirectUrl = new URL('/login', frontendOrigin)
+  redirectUrl.searchParams.set('redirect', redirectPath)
   redirectUrl.searchParams.set('authError', 'google_login_failed')
   return redirectUrl.toString()
 }
 
 const googleLogin = catchAsync(async (req: Request, res: Response) => {
   const redirectPath = (req.query.redirect as string) || '/dashboard'
-  // const frontendUrl = new URL(envConfig.FRONTEND_URL)
+  const frontendOrigin = resolveFrontendOrigin(req.query.origin as string)
 
   if (!redirectPath.startsWith('/') || redirectPath.startsWith('//')) {
     res.status(httpStatus.BAD_REQUEST).json({
@@ -160,12 +179,14 @@ const googleLogin = catchAsync(async (req: Request, res: Response) => {
     envConfig.BETTER_AUTH_URL
   )
   callbackURL.searchParams.set('redirect', redirectPath)
+  callbackURL.searchParams.set('origin', frontendOrigin)
 
   const errorCallbackURL = new URL(
     '/api/v1/auth/google/error',
     envConfig.BETTER_AUTH_URL
   )
   errorCallbackURL.searchParams.set('redirect', redirectPath)
+  errorCallbackURL.searchParams.set('origin', frontendOrigin)
 
   let data: globalThis.Response
   try {
@@ -179,7 +200,7 @@ const googleLogin = catchAsync(async (req: Request, res: Response) => {
       asResponse: true
     })
   } catch {
-    res.redirect(getGoogleErrorRedirect(redirectPath))
+    res.redirect(getGoogleErrorRedirect(redirectPath, frontendOrigin))
     return
   }
 
@@ -197,7 +218,7 @@ const googleLogin = catchAsync(async (req: Request, res: Response) => {
 
 const googleLoginSuccess = catchAsync(async (req: Request, res: Response) => {
   const redirectPath = (req.query.redirect as string) || '/dashboard'
-  const frontendUrl = new URL(envConfig.FRONTEND_URL)
+  const frontendOrigin = resolveFrontendOrigin(req.query.origin as string)
 
   if (!redirectPath.startsWith('/') || redirectPath.startsWith('//')) {
     res.status(httpStatus.BAD_REQUEST).json({
@@ -207,12 +228,27 @@ const googleLoginSuccess = catchAsync(async (req: Request, res: Response) => {
     return
   }
 
-  await AuthServices.completeGoogleLogin(fromNodeHeaders(req.headers))
-  res.redirect(new URL(redirectPath, frontendUrl).toString())
+  try {
+    const requestHeaders = fromNodeHeaders(req.headers)
+    await AuthServices.completeGoogleLogin(requestHeaders)
+
+    const { token } = await auth.api.generateOneTimeToken({
+      headers: requestHeaders
+    })
+
+    const callbackUrl = new URL('/api/auth/google/callback', frontendOrigin)
+    callbackUrl.searchParams.set('token', token)
+    callbackUrl.searchParams.set('redirect', redirectPath)
+
+    res.redirect(callbackUrl.toString())
+  } catch {
+    res.redirect(getGoogleErrorRedirect(redirectPath, frontendOrigin))
+  }
 })
 
 const googleLoginError = catchAsync(async (req: Request, res: Response) => {
   const redirectPath = (req.query.redirect as string) || '/dashboard'
+  const frontendOrigin = resolveFrontendOrigin(req.query.origin as string)
 
   if (!redirectPath.startsWith('/') || redirectPath.startsWith('//')) {
     res.status(httpStatus.BAD_REQUEST).json({
@@ -222,7 +258,7 @@ const googleLoginError = catchAsync(async (req: Request, res: Response) => {
     return
   }
 
-  res.redirect(getGoogleErrorRedirect(redirectPath))
+  res.redirect(getGoogleErrorRedirect(redirectPath, frontendOrigin))
 })
 
 const getSession = catchAsync(async (req: Request, res: Response) => {

@@ -2,7 +2,7 @@ import { betterAuth } from 'better-auth'
 import { prismaAdapter } from 'better-auth/adapters/prisma'
 import { prisma } from './prisma'
 import { Role, UserStatus } from '../../../generated/prisma/enums'
-import { emailOTP } from 'better-auth/plugins'
+import { emailOTP, oneTimeToken } from 'better-auth/plugins'
 import { sendEmail } from '../utils/email'
 import { envConfig } from '../config'
 
@@ -101,7 +101,8 @@ export const auth = betterAuth({
       },
       expiresIn: 2 * 60,
       otpLength: 6
-    })
+    }),
+    oneTimeToken({ storeToken: 'hashed' })
   ],
   socialProviders: {
     google: {
@@ -123,11 +124,7 @@ export const auth = betterAuth({
   account: {
     storeStateStrategy: 'cookie'
   },
-  trustedOrigins: [
-    envConfig.FRONTEND_URL,
-    'http://localhost:3000',
-    'http://127.0.0.1:3000'
-  ],
+  trustedOrigins: envConfig.ALLOWED_FRONTEND_ORIGINS,
   advanced: {
     useSecureCookies: envConfig.NODE_ENV === 'production',
     cookies: {

@@ -20,6 +20,7 @@ interface TEnvVars {
   GOOGLE_CLIENT_SECRET: string
   GOOGLE_CALLBACK_URL: string
   FRONTEND_URL: string
+  ALLOWED_FRONTEND_ORIGINS: string[]
   CLOUDINARY: {
     CLOUDINARY_CLOUD_NAME: string
     CLOUDINARY_API_KEY: string
@@ -67,6 +68,28 @@ const envVars = (): TEnvVars => {
     }
   }
 
+  const extraOrigins = (process.env.ALLOWED_FRONTEND_ORIGINS || '')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean)
+
+  const allowedFrontendOrigins = Array.from(
+    new Set(
+      [
+        process.env.FRONTEND_URL as string,
+        'http://localhost:3000',
+        'http://127.0.0.1:3000',
+        ...extraOrigins
+      ].flatMap((url) => {
+        try {
+          return [new URL(url).origin]
+        } catch {
+          return []
+        }
+      })
+    )
+  )
+
   return {
     PORT: process.env.PORT as string,
     DATABASE_URL: process.env.DATABASE_URL as string,
@@ -84,6 +107,7 @@ const envVars = (): TEnvVars => {
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET as string,
     GOOGLE_CALLBACK_URL: process.env.GOOGLE_CALLBACK_URL as string,
     FRONTEND_URL: process.env.FRONTEND_URL as string,
+    ALLOWED_FRONTEND_ORIGINS: allowedFrontendOrigins,
     CLOUDINARY: {
       CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME as string,
       CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY as string,

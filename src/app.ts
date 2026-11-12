@@ -16,7 +16,6 @@ import {
 } from './app/middleware/rateLimiter'
 
 const app: Application = express()
-const localFrontendOrigins = ['http://localhost:3000', 'http://127.0.0.1:3000']
 
 app.set('trust proxy', 1)
 app.set('query parser', (str: string) => qs.parse(str))
@@ -30,10 +29,9 @@ app.post(
 app.use(
   cors({
     origin: [
-      envConfig.FRONTEND_URL,
+      ...envConfig.ALLOWED_FRONTEND_ORIGINS,
       envConfig.BETTER_AUTH_URL,
-      'http://localhost:5000',
-      ...localFrontendOrigins
+      'http://localhost:5000'
     ],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
