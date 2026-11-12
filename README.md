@@ -70,6 +70,7 @@ The codebase is written in **TypeScript** using **Express.js v5**, **Prisma ORM*
 - Medical specialties CRUD (with icon upload)
 - Doctor profiles linked to specialties (many-to-many via `DoctorSpecialty`)
 - Public doctor listing with search, filter, pagination, and sorting
+- Best-performing / top-rated doctors endpoint
 - Doctor profile details including appointments, schedules, prescriptions, and reviews
 
 ### 📅 Appointment Scheduling
@@ -106,16 +107,24 @@ The codebase is written in **TypeScript** using **Express.js v5**, **Prisma ORM*
 - Automatic doctor average-rating recalculation on create/update/delete
 - Patients can update/delete their own reviews
 
-### 👤 Patient Profiles
+### 👤 Patient Profiles & Governance
 
 - Patient health data (blood group, allergies, diabetes, height, weight, smoking, pregnancy, mental health, immunization, surgeries, marital status, etc.)
 - Medical reports (name + link, uploadable to Cloudinary)
 - Profile photo uploads
+- Administrative patient management (list all patients, update status, soft-delete)
 
 ### 📊 Dashboard Statistics
 
 - Role-aware stats: Super Admin, Admin, Doctor, Patient each see different metrics
 - Counts (appointments, doctors, patients, admins, users, payments), total revenue, pie/bar chart data
+
+### 🛡️ Rate Limiting & Security
+
+- Global rate limiting (`express-rate-limit`) on `/api/v1` routes (100 requests per 15 minutes)
+- Sensitive authentication rate limiter on `/api/auth/*` (20 attempts per 15 minutes, skipping read-only operations)
+- Role-based authorization (`checkAuth`) with active account verification
+- Automatic cleanup of orphaned uploads on Cloudinary when requests fail
 
 ### 📧 Email (Nodemailer + EJS)
 
@@ -133,55 +142,43 @@ The codebase is written in **TypeScript** using **Express.js v5**, **Prisma ORM*
 - Specialty icons
 - Automatic cleanup of orphaned uploads on error via global error handler
 
-### ⏱️ Background Jobs
+### ⏱️ Background Jobs & Seeding
 
 - `node-cron` runs every 25 minutes: cancels appointments unpaid for >30 minutes and frees doctor schedules
+- Super admin auto-seeding on application startup
+- Historical demo data seed script (`pnpm db:seed:appointments`) for dashboard analytics
 
 ## Tech Stack
 
-| Layer             | Technology  | Version                             |
-| ----------------- | ----------- | ----------------------------------- |
-| Runtime           | Node.js     | 26.x                                |
-| Language          | TypeScript  | 6.x (via `@typescript/typescript6`) |
-| Web Framework     | Express.js  | 5.x                                 |
-| Package Manager   | pnpm        | 12.6.0                              |
-| ORM               | Prisma      | 7.10.0                              |
-| Database          | PostgreSQL  | —                                   |
-| Authentication    | Better Auth | 1.7.6                               |
-| Validation        | Zod         | 4.6.5                               |
-| Payments          | Stripe      | 23.x                                |
-| File Storage      | Cloudinary  | 2.11.0                              |
-| Email Transport   | Nodemailer  | 10.1.0                              |
-| Email Templates   | EJS         | 7.0.1                               |
-| PDF Generation    | pdfkit      | 0.20.2                              |
-| Date Utilities    | date-fns    | 4.4.0                               |
-| UUID              | uuid        | 14.x                                |
-| Cron Scheduling   | node-cron   | 4.6.0                               |
-| Query Parsing     | qs          | 6.16.0                              |
-| HTTP Status Codes | http-status | 2.1.0                               |
-| Linter            | ESLint      | 10.x                                |
-| Dev Server        | tsx         | 4.23.x                              |
+| Layer             | Technology         | Version                             |
+| ----------------- | ------------------ | ----------------------------------- |
+| Runtime           | Node.js            | 26.x                                |
+| Language          | TypeScript         | 6.x (via `@typescript/typescript6`) |
+| Web Framework     | Express.js         | 5.x                                 |
+| Package Manager   | pnpm               | 12.6.0                              |
+| ORM               | Prisma             | 7.10.0                              |
+| Database          | PostgreSQL         | —                                   |
+| Authentication    | Better Auth        | 1.7.6                               |
+| Rate Limiting     | express-rate-limit | 8.7.4                               |
+| Validation        | Zod                | 4.6.5                               |
+| Payments          | Stripe             | 23.x                                |
+| File Storage      | Cloudinary         | 2.11.0                              |
+| Email Transport   | Nodemailer         | 10.1.0                              |
+| Email Templates   | EJS                | 7.0.1                               |
+| PDF Generation    | pdfkit             | 0.20.2                              |
+| Date Utilities    | date-fns           | 4.4.0                               |
+| UUID              | uuid               | 14.x                                |
+| Cron Scheduling   | node-cron          | 4.6.0                               |
+| Query Parsing     | qs                 | 6.16.0                              |
+| HTTP Status Codes | http-status        | 2.1.0                               |
+| Linter            | ESLint             | 10.x                                |
+| Dev Server        | tsx                | 4.23.x                              |
 
 **Dev Engines:** `pnpm@12.6.0` (enforced via `devEngines` with `onFail: download`)
 
 ## Architecture
 
-### Docker with Neon
-
-Docker Compose uses Neon as the database; it does not start a local PostgreSQL container. Put your Neon connection string and the other required application variables in `.env`, then run:
-
-```bash
-docker compose up --build
-```
-
-The API is available at `http://localhost:5000`. The source directory is mounted into the development container, so changes are picked up by `tsx watch`. Compose runs pending Prisma migrations against Neon when the container starts.
-
-For a production image, build and run the `production` stage. Supply the same `.env` file at runtime so migrations can connect to Neon:
-
-```bash
-docker build --target production -t hms-backend .
-docker run --env-file .env -p 5000:5000 hms-backend
-```
+### Project Structure
 
 ```
 hms-backend/
@@ -195,7 +192,7 @@ hms-backend/
 │   │   ├── config/            # envConfig, Cloudinary, Stripe, Multer configs
 │   │   ├── lib/               # Prisma client, Better Auth instance
 │   │   ├── interface/         # Express Request augmentation, IUser, query interfaces
-│   │   ├── middleware/        # checkAuth (RBAC), validateRequest (Zod), globalErrorHandler, notFound
+│   │   ├── middleware/        # checkAuth (RBAC), rateLimiter, validateRequest (Zod), globalErrorHandler, notFound
 │   │   ├── modules/           # Feature-based modules (see below)
 │   │   ├── shared/            # AppError, catchAsync, sendResponse, Prisma error mappers
 │   │   ├── templates/         # EJS email templates (otp, prescription, invoice)
@@ -203,6 +200,9 @@ hms-backend/
 │   └── ...
 ├── dist/                      # Compiled output (tsc)
 ├── generated/prisma/          # Prisma Client generated artifacts
+├── Dockerfile                 # Multi-stage Docker container build (dev & prod)
+├── docker-compose.yml         # Docker Compose configuration for dev
+├── .dockerignore
 ├── .env                       # Environment variables (gitignored)
 ├── package.json
 ├── tsconfig.json
@@ -335,41 +335,39 @@ pnpm prisma generate      # generate Prisma Client
 pnpm dev                  # uses tsx watch on src/server.ts
 
 # 6. Build for production
-pnpm build                # tsc → dist/
-pnpm start                # node dist/server.js
-````
+pnpm build                # tsc6 → dist/
+pnpm start                # node dist/src/server.js
+```
 
 ### Docker Development
 
-Docker Compose runs the API with hot reload and a local PostgreSQL database. The source directory is mounted into the API container, so changes made on the host are picked up by `tsx watch`.
+Docker Compose runs the API container with hot reload (`tsx watch`) and runs pending Prisma migrations on startup against your Neon or PostgreSQL instance defined in `.env`:
 
 ```bash
-# 1. Create the environment file and fill in the application secrets
+# 1. Create the environment file and fill in required application secrets
 cp .env.example .env   # if .env.example exists; otherwise create .env manually
 
-# 2. Start the API and PostgreSQL
+# 2. Start the API container
 docker compose up --build
 
-# Stop the containers (database data is retained)
+# Stop the container
 docker compose down
-
-# Stop the containers and delete the local database volume
-docker compose down -v
 ```
 
-The API is available at `http://localhost:5000`. The Compose file overrides `DATABASE_URL` inside the API container to use the `db` service, while the other required variables are loaded from `.env`.
+The API is available at `http://localhost:5000`. The source directory is mounted into the container, so changes made on the host are automatically picked up by `tsx watch`.
 
 ### Available Scripts
 
-| Script                | Description                                                 |
-| --------------------- | ----------------------------------------------------------- |
-| `pnpm dev`            | Start dev server with `tsx watch` (hot reload)              |
-| `pnpm start`          | Start production server from `dist/`                        |
-| `pnpm build`          | Compile TypeScript to `dist/`                               |
-| `pnpm typecheck`      | Run `tsc --noEmit` for type checking                        |
-| `pnpm lint`           | Run ESLint on `./src`                                       |
-| `pnpm prisma:migrate` | Run `prisma migrate dev`                                    |
-| `pnpm stripe`         | Forward Stripe webhooks locally to `localhost:5000/webhook` |
+| Script                      | Description                                                  |
+| --------------------------- | ------------------------------------------------------------ |
+| `pnpm dev`                  | Start dev server with `tsx watch` (hot reload)               |
+| `pnpm start`                | Start production server (`node dist/src/server.js`)          |
+| `pnpm build`                | Compile TypeScript to `dist/` (`tsc6`)                       |
+| `pnpm typecheck`            | Run `tsc6 --noEmit` for type checking                        |
+| `pnpm lint`                 | Run ESLint on `./src`                                        |
+| `pnpm prisma:migrate`       | Run `prisma migrate dev`                                     |
+| `pnpm db:seed:appointments` | Seed demo doctors, patients, schedules, and appointments     |
+| `pnpm stripe`               | Forward Stripe webhooks locally to `localhost:5000/webhook`  |
 
 ### First-Time Setup (Super Admin)
 
@@ -440,21 +438,23 @@ http://localhost:5000/api/v1
 
 ### 1. Authentication (`/api/v1/auth`)
 
-| Method | Endpoint           | Auth     | Description                                   |
-| ------ | ------------------ | -------- | --------------------------------------------- |
-| POST   | `/register`        | Public   | Register a new patient (email/password)       |
-| GET    | `/login`           | Public   | Login (returns Set-Cookie session)            |
-| GET    | `/me`              | Any role | Get current user profile                      |
-| POST   | `/change-password` | Any role | Change password (blocked for Google accounts) |
-| POST   | `/logout`          | Any role | Log out (clear session cookie)                |
-| POST   | `/verify-email`    | Public   | Verify email with OTP                         |
-| POST   | `/forget-password` | Public   | Request password-reset OTP                    |
-| POST   | `/reset-password`  | Public   | Reset password with OTP                       |
-| GET    | `/login/google`    | Public   | Initiate Google OAuth                         |
-| GET    | `/google/success`  | Public   | Google OAuth success callback                 |
-| GET    | `/google/error`    | Public   | Google OAuth error callback                   |
+| Method | Endpoint                     | Auth     | Description                                   |
+| ------ | ---------------------------- | -------- | --------------------------------------------- |
+| POST   | `/register`                  | Public   | Register a new patient (email/password)       |
+| POST   | `/login`                     | Public   | Login with email & password (sets session)    |
+| GET    | `/me`                        | Any role | Get current user profile                      |
+| GET    | `/get-session`               | Any role | Get active session details                    |
+| POST   | `/change-password`           | Any role | Change password (blocked for Google accounts) |
+| POST   | `/logout`                    | Any role | Log out (clear session cookie)                |
+| POST   | `/resend-verification-email` | Public   | Resend email verification OTP                 |
+| POST   | `/verify-email`              | Public   | Verify email with OTP                         |
+| POST   | `/forget-password`           | Public   | Request password-reset OTP                    |
+| POST   | `/reset-password`            | Public   | Reset password with OTP                       |
+| GET    | `/login/google`              | Public   | Initiate Google OAuth                         |
+| GET    | `/google/success`            | Public   | Google OAuth success callback                 |
+| GET    | `/google/error`              | Public   | Google OAuth error callback                   |
 
-> **Note:** Login is `GET` with a JSON body in this implementation. Keep cookies between requests (Postman: use the same tab/collection with cookies enabled).
+> **Note:** Keep cookies between requests (Postman: use the same tab/collection with cookies enabled).
 
 ### 2. Specialties (`/api/v1/specialty`)
 
@@ -463,8 +463,8 @@ http://localhost:5000/api/v1
 | POST   | `/`      | ADMIN, SUPER_ADMIN | Create specialty (icon image upload) |
 | GET    | `/`      | Public             | List all specialties                 |
 | GET    | `/:id`   | Public             | Get single specialty                 |
-| PATCH  | `/:id`   | (controller)       | Update specialty                     |
-| DELETE | `/:id`   | (controller)       | Soft-delete specialty                |
+| PATCH  | `/:id`   | ADMIN, SUPER_ADMIN | Update specialty                     |
+| DELETE | `/:id`   | ADMIN, SUPER_ADMIN | Soft-delete specialty                |
 
 ### 3. User Management (`/api/v1/user`)
 
@@ -476,13 +476,14 @@ http://localhost:5000/api/v1
 
 ### 4. Doctors (`/api/v1/doctor`)
 
-| Method | Endpoint             | Auth         | Description                                   |
-| ------ | -------------------- | ------------ | --------------------------------------------- |
-| GET    | `/`                  | Public       | List doctors (search, filter, paginate, sort) |
-| GET    | `/:id`               | Public       | Get doctor by ID                              |
-| PATCH  | `/:id`               | (controller) | Update doctor                                 |
-| DELETE | `/:id`               | (controller) | Soft-delete doctor                            |
-| PATCH  | `/update-my-profile` | DOCTOR       | Update own profile (photo upload)             |
+| Method | Endpoint             | Auth               | Description                                   |
+| ------ | -------------------- | ------------------ | --------------------------------------------- |
+| GET    | `/`                  | Public (optional)  | List doctors (search, filter, paginate, sort) |
+| GET    | `/best-doctors`      | Public             | Get top-rated / best-performing doctors       |
+| GET    | `/:id`               | Public             | Get doctor by ID                              |
+| PATCH  | `/:id`               | ADMIN, SUPER_ADMIN | Update doctor                                 |
+| DELETE | `/:id`               | ADMIN, SUPER_ADMIN | Soft-delete doctor                            |
+| PATCH  | `/update-my-profile` | DOCTOR             | Update own profile (photo upload)             |
 
 ### 5. Admins (`/api/v1/admin`)
 
@@ -519,14 +520,15 @@ http://localhost:5000/api/v1
 
 ### 8. Doctor Schedules (`/api/v1/doctorSchedule`)
 
-| Method | Endpoint                          | Auth               | Description                     |
-| ------ | --------------------------------- | ------------------ | ------------------------------- |
-| POST   | `/create-doctor-wise-schedule`    | DOCTOR             | Claim schedules for this doctor |
-| GET    | `/doctor-wise-schedules`          | DOCTOR             | List this doctor's schedules    |
-| GET    | `/`                               | ADMIN, SUPER_ADMIN | List all doctor schedules       |
-| GET    | `/:doctorId/schedule/:scheduleId` | ADMIN, SUPER_ADMIN | Get specific doctor schedule    |
-| PATCH  | `/update-own-doctor-schedule`     | DOCTOR             | Update own doctor schedules     |
-| DELETE | `/delete-own-doctor-schedule/:id` | DOCTOR             | Delete own doctor schedule      |
+| Method | Endpoint                          | Auth               | Description                          |
+| ------ | --------------------------------- | ------------------ | ------------------------------------ |
+| POST   | `/create-doctor-wise-schedule`    | DOCTOR             | Claim schedules for this doctor      |
+| GET    | `/doctor-wise-schedules`          | DOCTOR             | List this doctor's schedules         |
+| GET    | `/`                               | ADMIN, SUPER_ADMIN | List all doctor schedules            |
+| GET    | `/:doctorId/schedule/:scheduleId` | ADMIN, SUPER_ADMIN | Get specific doctor schedule         |
+| GET    | `/:doctorId`                      | PATIENT            | Get available schedules by doctor ID |
+| PATCH  | `/update-own-doctor-schedule`     | DOCTOR             | Update own doctor schedules          |
+| DELETE | `/delete-own-doctor-schedule/:id` | DOCTOR             | Delete own doctor schedule           |
 
 ---
 
@@ -544,9 +546,12 @@ http://localhost:5000/api/v1
 
 ### 10. Patient (`/api/v1/patient`)
 
-| Method | Endpoint             | Auth    | Description                                                                 |
-| ------ | -------------------- | ------- | --------------------------------------------------------------------------- |
-| PATCH  | `/update-my-profile` | PATIENT | Update profile, health data, medical reports (photo + up to 5 report files) |
+| Method | Endpoint             | Auth               | Description                                                                 |
+| ------ | -------------------- | ------------------ | --------------------------------------------------------------------------- |
+| GET    | `/`                  | ADMIN, SUPER_ADMIN | List all patients (search, filter, paginate)                                |
+| PATCH  | `/update-my-profile` | PATIENT            | Update profile, health data, medical reports (photo + up to 5 report files) |
+| PATCH  | `/:id/status`        | ADMIN, SUPER_ADMIN | Update patient account status (ACTIVE, BLOCK, DELETED)                      |
+| DELETE | `/:id`               | ADMIN, SUPER_ADMIN | Soft-delete patient                                                         |
 
 ### 11. Reviews (`/api/v1/review`)
 
@@ -708,9 +713,15 @@ erDiagram
 
 ### CSRF / CORS
 
-- CORS configured with explicit origins: `FRONTEND_URL`, `BETTER_AUTH_URL`, `http://localhost:3000`
+- CORS configured with explicit origins: `FRONTEND_URL`, `BETTER_AUTH_URL`, `http://localhost:5000`, `http://localhost:3000`, `http://127.0.0.1:3000`
 - `credentials: true` to allow cookies cross-origin
 - Allowed methods: GET, POST, PUT, DELETE, PATCH
+
+### Rate Limiting
+
+- **Global API Rate Limiter** (`globalRateLimiter`): Applied to `/api/v1` routes; permits up to 100 requests per 15-minute window per IP.
+- **Authentication Rate Limiter** (`authRateLimiter`): Applied to sensitive `/api/auth/*` routes; permits up to 20 write/attempt requests per 15-minute window per IP. Safe `GET` requests (such as session checks) are bypassed to avoid blocking normal UI polling.
+- `app.set('trust proxy', 1)` is configured for accurate client IP resolution behind proxies.
 
 ### Input Validation
 
@@ -736,7 +747,7 @@ The repo includes `HMS.postman_collection.json`. Import it into Postman and set 
 **Recommended test flow:**
 
 1. `POST /api/v1/auth/register` — register a patient
-2. `GET /api/v1/auth/login` — login (save cookies)
+2. `POST /api/v1/auth/login` — login (save cookies)
 3. `POST /api/v1/auth/verify-email` — verify with OTP
 4. `GET /api/v1/specialty` — list specialties
 5. `POST /api/v1/appointment/book-appointment` — book (requires doctor + schedule)
@@ -759,8 +770,8 @@ pnpm prisma studio  # optional: open Prisma Studio to inspect DB
 
 ```bash
 pnpm install      # installs production dependencies
-pnpm build        # compiles TypeScript to dist/
-pnpm start        # runs node dist/server.js
+pnpm build        # compiles TypeScript to dist/ (tsc6)
+pnpm start        # runs node dist/src/server.js
 ```
 
 ### Production Checklist
@@ -776,9 +787,19 @@ pnpm start        # runs node dist/server.js
 - [ ] Run `pnpm prisma migrate deploy` (or `prisma migrate dev` on first deploy)
 - [ ] Ensure `SUPER_ADMIN_EMAIL` / `SUPER_ADMIN_PASSWORD` are strong
 
-### Docker
+### Docker (Containerized Deployment)
 
-No `Dockerfile` or `docker-compose.yml` is present in the repository. Containerization would be a straightforward addition (multi-stage build: `pnpm build` → `node dist/server.js`).
+The repository provides a multi-stage `Dockerfile` supporting both development and production targets:
+
+```bash
+# 1. Build the production image target
+docker build --target production -t hms-backend .
+
+# 2. Run the production container
+docker run --env-file .env -p 5000:5000 hms-backend
+```
+
+On container startup, the production image automatically applies pending migrations (`pnpm exec prisma migrate deploy`) before launching the server.
 
 ### CI/CD
 
@@ -796,10 +817,8 @@ No GitHub Actions or CI configuration is present. Recommended additions:
 | --------------------------- | ------------------------------------------------------------------------------ |
 | **Testing**                 | Add unit/integration tests (Vitest or Jest + Supertest)                        |
 | **Type Safety**             | Replace `npm:@typescript/typescript6` with stable TypeScript 5.x               |
-| **Containerization**        | Add `Dockerfile` + `docker-compose.yml`                                        |
 | **CI/CD**                   | GitHub Actions workflow for lint, typecheck, and migrations                    |
 | **API Docs**                | Add Swagger/OpenAPI (e.g., `swagger-ui-express`)                               |
-| **Rate Limiting**           | Add `express-rate-limit` on auth endpoints                                     |
 | **Pagination Consistency**  | Some list endpoints (e.g., specialty) lack pagination                          |
 | **Soft-Delete Consistency** | Some list endpoints don't filter `isDeleted` (noted in `API_TESTING_GUIDE.md`) |
 | **File Validation**         | Add file type/size limits for Cloudinary uploads                               |
@@ -815,4 +834,4 @@ Repository: [hospital-management-system-back-end](https://github.com/AsifurRahma
 
 ## License
 
-## ISC License — see `package.json` for details.
+ISC License — see `package.json` for details.
