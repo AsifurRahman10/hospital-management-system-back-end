@@ -220,7 +220,7 @@ const verifyEmail = async (email: string, otp: string) => {
 }
 
 const forgetPassword = async (email: string) => {
-  const isUserExist = await prisma.user.findUnique({
+  const isUserExist = await prisma.user.findUniqueOrThrow({
     where: {
       email
     }
