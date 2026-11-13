@@ -8,8 +8,6 @@ import cors from 'cors'
 import { envConfig } from './app/config'
 import qs from 'qs'
 import { PaymentController } from './app/modules/payment/payment.controller'
-import cron from 'node-cron'
-import { AppointmentService } from './app/modules/appointment/appointment.service'
 import {
   authRateLimiter,
   globalRateLimiter
@@ -44,14 +42,14 @@ app.use(express.urlencoded({ extended: true }))
 
 app.all('/api/auth/*splat', authRateLimiter, toNodeHandler(auth))
 
-cron.schedule('*/25 * * * *', async () => {
-  try {
-    console.log(`Running cron job to cancel unpaid appointments`)
-    await AppointmentService.cancelUnpaidAppointment()
-  } catch (error) {
-    console.log(error)
-  }
-})
+// cron.schedule('*/25 * * * *', async () => {
+//   try {
+//     console.log(`Running cron job to cancel unpaid appointments`)
+//     await AppointmentService.cancelUnpaidAppointment()
+//   } catch (error) {
+//     console.log(error)
+//   }
+// })
 
 // Middleware to parse JSON bodies
 app.use(express.json())
