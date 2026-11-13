@@ -32,6 +32,10 @@ interface TEnvVars {
   }
   SUPER_ADMIN_EMAIL: string
   SUPER_ADMIN_PASSWORD: string
+  GMAIL: {
+    SCRIPT_URL: string
+    SCRIPT_SECRET: string
+  }
 }
 
 const envVars = (): TEnvVars => {
@@ -56,7 +60,9 @@ const envVars = (): TEnvVars => {
     'STRIPE_SECRET_KEY',
     'STRIPE_WEBHOOK_SECRET',
     'SUPER_ADMIN_EMAIL',
-    'SUPER_ADMIN_PASSWORD'
+    'SUPER_ADMIN_PASSWORD',
+    'GMAIL_SCRIPT_URL',
+    'GMAIL_SCRIPT_SECRET'
   ]
 
   for (const envVar of requiredEnvVars) {
@@ -118,7 +124,11 @@ const envVars = (): TEnvVars => {
       STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET as string
     },
     SUPER_ADMIN_EMAIL: process.env.SUPER_ADMIN_EMAIL as string,
-    SUPER_ADMIN_PASSWORD: process.env.SUPER_ADMIN_PASSWORD as string
+    SUPER_ADMIN_PASSWORD: process.env.SUPER_ADMIN_PASSWORD as string,
+    GMAIL: {
+      SCRIPT_URL: process.env.GMAIL_SCRIPT_URL!,
+      SCRIPT_SECRET: process.env.GMAIL_SCRIPT_SECRET!
+    }
   }
 }
 
