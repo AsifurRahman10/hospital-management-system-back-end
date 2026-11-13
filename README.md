@@ -80,7 +80,7 @@ The codebase is written in **TypeScript** using **Express.js v5**, **Prisma ORM*
 - Patients book appointments against available doctor schedules
 - Automatic Stripe Checkout session creation on booking
 - **Pay-later** option — book appointment without immediate payment
-- Cron job cancels unpaid appointments after 30 minutes and releases the slot
+- Cron job cancels unpaid appointments after 30 minutes and releases the slot (triggered externally via cron-job.org)
 - Appointment status transitions (SCHEDULED → INPROGRESS → COMPLETED / CANCELED)
 - Video calling ID generated per appointment
 
@@ -126,12 +126,13 @@ The codebase is written in **TypeScript** using **Express.js v5**, **Prisma ORM*
 - Role-based authorization (`checkAuth`) with active account verification
 - Automatic cleanup of orphaned uploads on Cloudinary when requests fail
 
-### 📧 Email (Nodemailer + EJS)
+### 📧 Email (Gmail via Google Apps Script + EJS)
 
 - OTP verification emails
 - Password reset emails
 - Prescription delivery emails (with PDF attachment)
 - Invoice/payment confirmation emails (with PDF attachment)
+- Email delivery dispatched via Google Apps Script Web App (Gmail service) to avoid SMTP port blocking on free cloud hosting (Render)
 - EJS templates in `src/app/templates/`
 
 ### ☁️ File Storage (Cloudinary)
@@ -144,7 +145,8 @@ The codebase is written in **TypeScript** using **Express.js v5**, **Prisma ORM*
 
 ### ⏱️ Background Jobs & Seeding
 
-- `node-cron` runs every 25 minutes: cancels appointments unpaid for >30 minutes and frees doctor schedules
+- **External Cron Scheduling (cron-job.org)**: Replaced in-memory `node-cron` with an authenticated HTTP route (`GET /api/v1/cron/cancel-unpaid-appointments` secured via Bearer `CRON_SECRET`). This prevents cron jobs from stopping on Render's free tier (where idle services spin down after 15 minutes of inactivity) and simultaneously keeps the instance awake.
+- Automatically cancels appointments unpaid for >30 minutes and frees up doctor schedule slots.
 - Super admin auto-seeding on application startup
 - Historical demo data seed script (`pnpm db:seed:appointments`) for dashboard analytics
 
@@ -163,12 +165,12 @@ The codebase is written in **TypeScript** using **Express.js v5**, **Prisma ORM*
 | Validation        | Zod                | 4.6.5                               |
 | Payments          | Stripe             | 23.x                                |
 | File Storage      | Cloudinary         | 2.11.0                              |
-| Email Transport   | Nodemailer         | 10.1.0                              |
-| Email Templates   | EJS                | 7.0.1                               |
-| PDF Generation    | pdfkit             | 0.20.2                              |
-| Date Utilities    | date-fns           | 4.4.0                               |
-| UUID              | uuid               | 14.x                                |
-| Cron Scheduling   | node-cron          | 4.6.0                               |
+| Email Transport   | Google Apps Script (Gmail Web App) | —                                   |
+| Email Templates   | EJS                                | 7.0.1                               |
+| PDF Generation    | pdfkit                             | 0.20.2                              |
+| Date Utilities    | date-fns                           | 4.4.0                               |
+| UUID              | uuid                               | 14.x                                |
+| Cron Scheduling   | cron-job.org (External Webhook)    | —                                   |
 | Query Parsing     | qs                 | 6.16.0                              |
 | HTTP Status Codes | http-status        | 2.1.0                               |
 | Linter            | ESLint             | 10.x                                |
@@ -187,7 +189,7 @@ hms-backend/
 │   └── migrations/            # Versioned SQL migrations
 ├── src/
 │   ├── server.ts              # Entry point (seeds super admin, starts Express)
-│   ├── app.ts                 # Express app, CORS, Stripe webhook, cron job
+│   ├── app.ts                 # Express app, CORS, Stripe webhook
 │   ├── app/
 │   │   ├── config/            # envConfig, Cloudinary, Stripe, Multer configs
 │   │   ├── lib/               # Prisma client, Better Auth instance
@@ -230,6 +232,7 @@ Each module follows a consistent pattern: `route.ts` → `controller.ts` → `se
 | `prescription`   | Prescription CRUD with PDF generation & email                                                          |
 | `payment`        | Stripe webhook handler                                                                                 |
 | `stats`          | Role-aware dashboard statistics                                                                        |
+| `cron`           | External cron webhook (`cancel-unpaid-appointments`) secured via Bearer token                           |
 
 ### Request Flow
 
@@ -310,7 +313,8 @@ Error responses:
 - **PostgreSQL** database (local or hosted, e.g. Prisma Data Platform)
 - **Stripe** account (test keys) for payments
 - **Cloudinary** account for file storage
-- **Gmail/SMTP** account for email sending
+- **Google Apps Script Web App** deployed with Gmail service for transactional emails
+- **cron-job.org** account (or any external HTTP cron scheduler) for background job triggers
 - **Google Cloud** project with OAuth credentials (optional, for Google login)
 
 ### Installation
@@ -393,12 +397,12 @@ DATABASE_URL=postgresql://user:password@localhost:5432/hms?sslmode=require
 BETTER_AUTH_SECRET=<long-random-string>   # generate with: openssl rand -base64 32
 BETTER_AUTH_URL=http://localhost:5000
 
-# === Email (SMTP) ===
-EMAIL_SENDER_SMTP_USER=your-email@gmail.com
-EMAIL_SENDER_SMTP_PASS=your-app-password     # Gmail app password, not regular password
-EMAIL_SENDER_SMTP_HOST=smtp.gmail.com
-EMAIL_SENDER_SMTP_PORT=465
-EMAIL_SENDER_SMTP_FROM=your-email@gmail.com
+# === Email (Google Apps Script / Gmail) ===
+GMAIL_SCRIPT_URL=https://script.google.com/macros/s/your-script-deployment-id/exec
+GMAIL_SCRIPT_SECRET=your-gmail-script-secret
+
+# === External Cron Webhook ===
+CRON_SECRET=your-cron-secret-token
 
 # === Google OAuth ===
 GOOGLE_CLIENT_ID=your-google-client-id
@@ -407,6 +411,7 @@ GOOGLE_CALLBACK_URL=http://localhost:5000/api/auth/callback/google
 
 # === Frontend ===
 FRONTEND_URL=http://localhost:3000
+ALLOWED_FRONTEND_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
 
 # === Cloudinary ===
 CLOUDINARY_CLOUD_NAME=your-cloud-name
@@ -579,7 +584,15 @@ http://localhost:5000/api/v1
 | ------ | -------- | -------- | ------------------------------------ |
 | GET    | `/`      | Any role | Dashboard stats (role-aware metrics) |
 
-### 14. Stripe Webhook
+### 14. Cron (`/api/v1/cron`)
+
+| Method | Endpoint                      | Auth                               | Description                                                                              |
+| ------ | ----------------------------- | ---------------------------------- | ---------------------------------------------------------------------------------------- |
+| GET    | `/cancel-unpaid-appointments` | Bearer Token (`CRON_SECRET` match) | Processes & cancels appointments unpaid for >30 minutes and frees up doctor schedule slots |
+
+> **Note:** Pinged periodically (e.g., every 15–25 minutes) via an external cron service such as [cron-job.org](https://cron-job.org) with header `Authorization: Bearer <CRON_SECRET>`. This design ensures scheduled jobs execute reliably despite Render's free-tier inactivity spin-down, while keeping the server awake.
+
+### 15. Stripe Webhook
 
 | Method | Endpoint   | Auth                               | Description                                                                                   |
 | ------ | ---------- | ---------------------------------- | --------------------------------------------------------------------------------------------- |
@@ -731,7 +744,7 @@ erDiagram
 
 ### Secrets Management
 
-- All secrets live in `.env` (gitignored): `BETTER_AUTH_SECRET`, SMTP credentials, Stripe keys, Cloudinary secret, Google OAuth secret
+- All secrets live in `.env` (gitignored): `BETTER_AUTH_SECRET`, Gmail script credentials (`GMAIL_SCRIPT_URL`, `GMAIL_SCRIPT_SECRET`), `CRON_SECRET`, Stripe keys, Cloudinary secret, Google OAuth secret
 - `envConfig` throws at startup if any required variable is missing — fails fast instead of runtime surprises
 
 ---
@@ -782,7 +795,8 @@ pnpm start        # runs node dist/src/server.js
 - [ ] Configure `STRIPE_SECRET_KEY` with live keys (not test)
 - [ ] Set `STRIPE_WEBHOOK_SECRET` and register the webhook endpoint in Stripe Dashboard pointing to `https://your-domain.com/webhook`
 - [ ] Verify `CLOUDINARY_*` credentials
-- [ ] Verify SMTP credentials and `EMAIL_SENDER_SMTP_FROM`
+- [ ] Configure `GMAIL_SCRIPT_URL` and `GMAIL_SCRIPT_SECRET` for transactional email delivery via Google Apps Script
+- [ ] Configure `CRON_SECRET` and schedule a periodic GET request on [cron-job.org](https://cron-job.org) targeting `https://your-domain.com/api/v1/cron/cancel-unpaid-appointments` with `Authorization: Bearer <CRON_SECRET>`
 - [ ] Set `FRONTEND_URL` to your production frontend domain
 - [ ] Run `pnpm prisma migrate deploy` (or `prisma migrate dev` on first deploy)
 - [ ] Ensure `SUPER_ADMIN_EMAIL` / `SUPER_ADMIN_PASSWORD` are strong
