@@ -36,6 +36,7 @@ interface TEnvVars {
     SCRIPT_URL: string
     SCRIPT_SECRET: string
   }
+  CRON_SECRET: string
 }
 
 const envVars = (): TEnvVars => {
@@ -62,7 +63,8 @@ const envVars = (): TEnvVars => {
     'SUPER_ADMIN_EMAIL',
     'SUPER_ADMIN_PASSWORD',
     'GMAIL_SCRIPT_URL',
-    'GMAIL_SCRIPT_SECRET'
+    'GMAIL_SCRIPT_SECRET',
+    'CRON_SECRET'
   ]
 
   for (const envVar of requiredEnvVars) {
@@ -128,7 +130,8 @@ const envVars = (): TEnvVars => {
     GMAIL: {
       SCRIPT_URL: process.env.GMAIL_SCRIPT_URL!,
       SCRIPT_SECRET: process.env.GMAIL_SCRIPT_SECRET!
-    }
+    },
+    CRON_SECRET: process.env.CRON_SECRET as string
   }
 }
 
