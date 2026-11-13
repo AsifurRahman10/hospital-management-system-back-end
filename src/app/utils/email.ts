@@ -1,14 +1,20 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-
-import { Resend } from 'resend'
 import ejs from 'ejs'
 import status from 'http-status'
+import nodemailer from 'nodemailer'
 import path from 'path'
-
 import { envConfig } from '../config'
 import AppError from '../shared/AppError'
 
-const resend = new Resend(envConfig.EMAIL_SENDER.RESEND_API_KEY)
+const transporter = nodemailer.createTransport({
+  host: envConfig.EMAIL_SENDER.EMAIL_SENDER_SMTP_HOST,
+  secure: true,
+  auth: {
+    user: envConfig.EMAIL_SENDER.EMAIL_SENDER_SMTP_USER,
+    pass: envConfig.EMAIL_SENDER.EMAIL_SENDER_SMTP_PASS
+  },
+  port: Number(envConfig.EMAIL_SENDER.EMAIL_SENDER_SMTP_PORT)
+})
 
 interface SendEmailOptions {
   to: string
@@ -37,11 +43,11 @@ export const sendEmail = async ({
 
     const html = await ejs.renderFile(templatePath, templateData)
 
-    const { data, error } = await resend.emails.send({
-      from: envConfig.EMAIL_SENDER.RESEND_EMAIL_SENDER_FROM,
-      to,
-      subject,
-      html,
+    const info = await transporter.sendMail({
+      from: envConfig.EMAIL_SENDER.EMAIL_SENDER_SMTP_FROM,
+      to: to,
+      subject: subject,
+      html: html,
       attachments: attachments?.map((attachment) => ({
         filename: attachment.filename,
         content: attachment.content,
@@ -49,20 +55,9 @@ export const sendEmail = async ({
       }))
     })
 
-    if (error) {
-      console.error('Resend Error:', error)
-      throw new Error(error.message)
-    }
-
-    console.log(`Email sent to ${to}: ${data?.id}`)
-
-    return data
-  } catch (error) {
-    console.error(
-      'Email Sending Error:',
-      error instanceof Error ? error.message : error
-    )
-
+    console.log(`Email sent to ${to} : ${info.messageId}`)
+  } catch (error: any) {
+    console.log('Email Sending Error', error.message)
     throw new AppError(status.INTERNAL_SERVER_ERROR, 'Failed to send email')
   }
 }
