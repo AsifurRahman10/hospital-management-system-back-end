@@ -1,30 +1,32 @@
 import { Request, Response } from 'express'
-import catchAsync from '../../shared/catchAsync'
 import httpStatus from 'http-status'
+
 import { envConfig } from '../../config'
 import { AppointmentService } from '../appointment/appointment.service'
 
-const cancelUnpaidAppointments = catchAsync(
-  async (req: Request, res: Response) => {
+const cancelUnpaidAppointments = async (req: Request, res: Response) => {
+  try {
     const authHeader = req.headers.authorization
 
     if (authHeader !== `Bearer ${envConfig.CRON_SECRET}`) {
-      return res.status(httpStatus.UNAUTHORIZED).json({
-        success: false,
-        message: 'Unauthorized cron request'
-      })
+      return res.sendStatus(httpStatus.UNAUTHORIZED)
     }
 
-    console.log('Running cron job to cancel unpaid appointments')
+    console.log('[CRON] Running unpaid appointment cancellation')
 
     await AppointmentService.cancelUnpaidAppointment()
 
-    return res.status(httpStatus.OK).json({
-      success: true,
-      message: 'Unpaid appointments processed successfully'
-    })
+    console.log('[CRON] Unpaid appointments processed successfully')
+
+    return res.sendStatus(httpStatus.NO_CONTENT)
+  } catch (error) {
+    console.error('[CRON] Appointment cancellation failed:', error)
+
+    return res
+      .status(httpStatus.INTERNAL_SERVER_ERROR)
+      .send('Cron execution failed')
   }
-)
+}
 
 export const CronController = {
   cancelUnpaidAppointments
