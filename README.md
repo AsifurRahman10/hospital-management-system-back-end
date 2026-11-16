@@ -1,12 +1,14 @@
 # HMS Backend
 
-> **HMS Backend** — A production-ready, role-based Hospital Management System API built with Node.js, TypeScript, Express, Prisma, and Better Auth. Handles patient registration, doctor onboarding, appointment scheduling with Stripe payments, prescription generation, reviews, and admin/super-admin governance.
+> **HMS Backend** — A production-ready, role-based Hospital Management System API built with Node.js, TypeScript, Express, Prisma, and Better Auth. Handles patient registration, doctor onboarding, appointment scheduling with Stripe payments, prescription generation, reviews, admin/super-admin governance, and AI-powered doctor recommendations via Retrieval-Augmented Generation (RAG).
 
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue?logo=typescript)](https://www.typescriptlang.org/)
 [![Express](https://img.shields.io/badge/Express.js-5.x-black?logo=express)](https://expressjs.com/)
 [![Prisma](https://img.shields.io/badge/Prisma-ORM-2D3748?logo=prisma)](https://www.prisma.io/)
 [![Better Auth](https://img.shields.io/badge/Better%20Auth-v1-purple)](https://better-auth.com/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Database-336791?logo=postgresql)](https://www.postgresql.org/)
+[![pgvector](https://img.shields.io/badge/Vector%20DB-pgvector-336791?logo=postgresql)](https://github.com/pgvector/pgvector)
+[![OpenRouter](https://img.shields.io/badge/AI%20%2F%20RAG-OpenRouter-6366f1)](https://openrouter.ai/)
 [![Stripe](https://img.shields.io/badge/Payments-Stripe-008CDD?logo=stripe)](https://stripe.com/)
 [![Cloudinary](https://img.shields.io/badge/Storage-Cloudinary-36448F?logo=cloudinary)](https://cloudinary.com/)
 [![pnpm](https://img.shields.io/badge/Package%20Manager-pnpm-F69220?logo=pnpm)](https://pnpm.io/)
@@ -33,7 +35,7 @@
 
 ## Introduction
 
-**HMS Backend** is the server-side powering a Hospital Management System (HMS). It provides a secure, scalable REST API that supports multi-role access (Super Admin, Admin, Doctor, Patient) with session-based authentication via [Better Auth](https://better-auth.com/). Core capabilities include appointment booking with Stripe checkout, digital prescription generation (PDF), doctor scheduling, patient health records, reviews & ratings, and administrative governance with soft-delete patterns.
+**HMS Backend** is the server-side powering a Hospital Management System (HMS). It provides a secure, scalable REST API that supports multi-role access (Super Admin, Admin, Doctor, Patient) with session-based authentication via [Better Auth](https://better-auth.com/). Core capabilities include appointment booking with Stripe checkout, digital prescription generation (PDF), doctor scheduling, patient health records, reviews & ratings, administrative governance with soft-delete patterns, and an AI-driven doctor recommendation engine powered by RAG (Retrieval-Augmented Generation) and PostgreSQL pgvector.
 
 The codebase is written in **TypeScript** using **Express.js v5**, **Prisma ORM** against **PostgreSQL**, and follows a clean **Controller → Service → Repository** separation with shared middleware for error handling, request validation (Zod), and role-based access control.
 
@@ -148,17 +150,27 @@ The codebase is written in **TypeScript** using **Express.js v5**, **Prisma ORM*
 - Super admin auto-seeding on application startup
 - Historical demo data seed script (`pnpm db:seed:appointments`) for dashboard analytics
 
+### 🤖 Retrieval-Augmented Generation (RAG) & AI Doctor Recommendations
+
+- **Intelligent Doctor Recommendations**: Natural language query endpoint (`POST /api/v1/rag/query`) helping patients find suitable doctors matching symptoms, required specialties, experience, and patient review sentiments.
+- **Vector Embeddings (OpenRouter)**: Generates 2048-dimensional dense vector embeddings using OpenRouter API (`nvidia/nemotron-3.5-embed-1b:free`).
+- **pgvector Vector Database**: Native PostgreSQL vector similarity search leveraging the `pgvector` extension and cosine distance (`<=>`) on the `document_embeddings` table.
+- **Doctor Profile Vectorization**: Super Admin indexing endpoint (`POST /api/v1/rag/ingest-doctors`) that compiles doctor qualifications, specialties, fees, workplace, experience, and patient reviews into structured context chunks and generates vector embeddings.
+- **Context-Augmented LLM Generation**: Synthesizes recommendations via OpenRouter LLMs (`nvidia/nemotron-3.5-super-vl:free`) with structured JSON schema output and source citation metadata (chunk keys, labels, similarity scores).
+
 ## Tech Stack
 
-| Layer             | Technology         | Version                             |
-| ----------------- | ------------------ | ----------------------------------- |
-| Runtime           | Node.js            | 26.x                                |
-| Language          | TypeScript         | 6.x (via `@typescript/typescript6`) |
-| Web Framework     | Express.js         | 5.x                                 |
-| Package Manager   | pnpm               | 12.6.0                              |
-| ORM               | Prisma             | 7.10.0                              |
-| Database          | PostgreSQL         | —                                   |
-| Authentication    | Better Auth        | 1.7.6                               |
+| Layer             | Technology                      | Version                             |
+| ----------------- | ------------------------------- | ----------------------------------- |
+| Runtime           | Node.js                         | 26.x                                |
+| Language          | TypeScript                      | 6.x (via `@typescript/typescript6`) |
+| Web Framework     | Express.js                      | 5.x                                 |
+| Package Manager   | pnpm                            | 12.6.0                              |
+| ORM               | Prisma                          | 7.10.0                              |
+| Database          | PostgreSQL                      | —                                   |
+| Vector Database   | pgvector (PostgreSQL extension) | —                                   |
+| AI & Embeddings   | OpenRouter (LLM + Embeddings)   | —                                   |
+| Authentication    | Better Auth                     | 1.7.6                               |
 | Rate Limiting     | express-rate-limit | 8.7.4                               |
 | Validation        | Zod                | 4.6.5                               |
 | Payments          | Stripe             | 23.x                                |
@@ -230,6 +242,7 @@ Each module follows a consistent pattern: `route.ts` → `controller.ts` → `se
 | `prescription`   | Prescription CRUD with PDF generation & email                                                          |
 | `payment`        | Stripe webhook handler                                                                                 |
 | `stats`          | Role-aware dashboard statistics                                                                        |
+| `rag`            | Retrieval-Augmented Generation (RAG): doctor vector indexing, OpenRouter embeddings & LLM recommendation |
 
 ### Request Flow
 
@@ -307,11 +320,12 @@ Error responses:
 
 - **Node.js** 20+ (tested on 26.x)
 - **pnpm** 12.6.0 (or let `packageManager` field auto-download it)
-- **PostgreSQL** database (local or hosted, e.g. Prisma Data Platform)
+- **PostgreSQL** database with `pgvector` extension enabled (local or hosted, e.g. Neon, Supabase, or AWS RDS)
 - **Stripe** account (test keys) for payments
 - **Cloudinary** account for file storage
 - **Gmail/SMTP** account for email sending
 - **Google Cloud** project with OAuth credentials (optional, for Google login)
+- **OpenRouter** API key (for RAG vector embeddings and LLM doctor recommendations)
 
 ### Installation
 
@@ -420,6 +434,11 @@ STRIPE_WEBHOOK_SECRET=whsec_...
 # === Super Admin Seed ===
 SUPER_ADMIN_EMAIL=superadmin@email.com
 SUPER_ADMIN_PASSWORD=12345678
+
+# === AI / OpenRouter (RAG) ===
+OPENROUTER_API_KEY=your-openrouter-api-key
+OPENROUTER_EMBEDDING_MODEL=nvidia/nemotron-3.5-embed-1b:free
+OPENROUTER_LLM_MODEL=nvidia/nemotron-3.5-super-vl:free
 ```
 
 > ⚠️ **Security:** Never commit `.env`. It is already in `.gitignore`. Rotate any credentials that have been accidentally committed.
@@ -587,6 +606,59 @@ http://localhost:5000/api/v1
 
 > The webhook is mounted directly in `app.ts` (not under `/api/v1`) at `POST /webhook` with `express.raw()` body parsing.
 
+### 15. RAG & AI Doctor Search (`/api/v1/rag`)
+
+| Method | Endpoint          | Auth        | Description                                                                    |
+| ------ | ----------------- | ----------- | ------------------------------------------------------------------------------ |
+| GET    | `/stats`          | Public      | Health/connectivity check for RAG endpoints                                   |
+| POST   | `/ingest-doctors` | SUPER_ADMIN | Ingest & vectorize all active doctor profiles, specialties, and reviews into pgvector |
+| POST   | `/query`          | Public      | Query AI recommendations based on symptoms, specialties, or doctor attributes |
+
+#### RAG Query Example (`POST /api/v1/rag/query`)
+
+**Request Body:**
+
+```json
+{
+  "query": "I have persistent high blood pressure and chest discomfort. Which cardiologist should I see?",
+  "limit": 5,
+  "sourceType": "DOCTOR"
+}
+```
+
+**Response:**
+
+```json
+{
+  "statusCode": 200,
+  "success": true,
+  "message": "RAG query results",
+  "data": {
+    "answer": {
+      "doctors": [
+        {
+          "name": "Dr. Sarah Jenkins",
+          "reason": "Specializes in Cardiology with 12 years of experience handling hypertension and coronary symptoms.",
+          "specialty": "Cardiology"
+        }
+      ]
+    },
+    "sources": [
+      {
+        "id": "019335a0-9884-7546-b63e-f14d862f928e",
+        "chunkKey": "doctor-clx87xyz",
+        "sourceType": "DOCTOR",
+        "sourceId": "clx87xyz",
+        "sourceLabel": "Dr. Sarah Jenkins",
+        "content": "Doctor Name: Dr. Sarah Jenkins\nExperience: 12 years\nQualification: MBBS, MD (Cardiology)...",
+        "similarity": 0.882
+      }
+    ],
+    "contextUsed": true
+  }
+}
+```
+
 ---
 
 ## Database Design
@@ -651,6 +723,7 @@ erDiagram
 | `payment`                              | Stripe payment: amount, transactionId, invoiceUrl, status (PAID/UNPAID)                                                                                             |
 | `review`                               | Rating 1–5 + comment, unique per appointment                                                                                                                        |
 | `prescription`                         | Instructions + followUpDate + pdfUrl, unique per appointment                                                                                                        |
+| `documentEmbedding`                    | Vector storage (`document_embeddings`): chunkKey, sourceId, sourceType, sourceLabel, content, metadata JSON, and 2048-dim vector embedding (`vector(2048)`)        |
 
 ### Enums
 
@@ -674,6 +747,9 @@ erDiagram
 - `review(appointmentId)` unique
 - `prescription(appointmentId)` unique
 - `doctorSchedules(doctorId, scheduleId)` compound unique
+- `document_embeddings(chunkKey)` unique
+- `document_embeddings(sourceType)`, `document_embeddings(sourceId)`
+- Vector similarity search indexing supported via PostgreSQL `pgvector` (`vector(2048)`)
 - Soft-delete patterns: `isDeleted` indexes on specialty, admin, super_admin, doctor
 
 ---
