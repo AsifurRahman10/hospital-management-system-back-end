@@ -39,6 +39,7 @@ interface TEnvVars {
   CRON_SECRET: string
   OPENROUTER_EMBEDDING_MODEL: string
   OPENROUTER_API_KEY: string
+  OPENROUTER_LLM_MODEL: string
 }
 
 const envVars = (): TEnvVars => {
@@ -68,7 +69,8 @@ const envVars = (): TEnvVars => {
     'GMAIL_SCRIPT_SECRET',
     'OPENROUTER_EMBEDDING_MODEL',
     'OPENROUTER_API_KEY',
-    'CRON_SECRET'
+    'CRON_SECRET',
+    'OPENROUTER_LLM_MODEL'
   ]
 
   for (const envVar of requiredEnvVars) {
@@ -138,6 +140,7 @@ const envVars = (): TEnvVars => {
     CRON_SECRET: process.env.CRON_SECRET as string,
     OPENROUTER_EMBEDDING_MODEL: process.env
       .OPENROUTER_EMBEDDING_MODEL as string,
+    OPENROUTER_LLM_MODEL: process.env.OPENROUTER_LLM_MODEL as string,
     OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY as string
   }
 }

@@ -22,7 +22,33 @@ const ingestDoctors = catchAsync(async (req: Request, res: Response) => {
   })
 })
 
+const queryRag = catchAsync(async (req: Request, res: Response) => {
+  const { query, limit, sourceType } = req.body
+
+  if (!query) {
+    return sendResponse(res, {
+      success: false,
+      statusCode: status.BAD_REQUEST,
+      message: 'Query is required'
+    })
+  }
+  const result = await ragService.generateAnswer(
+    query,
+    limit ?? 5,
+    sourceType,
+    true
+  )
+
+  sendResponse(res, {
+    statusCode: status.OK,
+    success: true,
+    message: 'RAG query results',
+    data: result
+  })
+})
+
 export const RagController = {
   getStats,
-  ingestDoctors
+  ingestDoctors,
+  queryRag
 }

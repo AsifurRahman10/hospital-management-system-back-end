@@ -12,5 +12,6 @@ router.post(
   checkAuth(Role.SUPER_ADMIN),
   RagController.ingestDoctors
 )
+router.post('/query', RagController.queryRag)
 
 export const RagRoutes = router
