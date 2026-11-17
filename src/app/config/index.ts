@@ -37,6 +37,10 @@ interface TEnvVars {
     SCRIPT_SECRET: string
   }
   CRON_SECRET: string
+  OPENROUTER_EMBEDDING_MODEL: string
+  OPENROUTER_API_KEY: string
+  OPENROUTER_LLM_MODEL: string
+  REDIS_URL: string
 }
 
 const envVars = (): TEnvVars => {
@@ -64,7 +68,11 @@ const envVars = (): TEnvVars => {
     'SUPER_ADMIN_PASSWORD',
     'GMAIL_SCRIPT_URL',
     'GMAIL_SCRIPT_SECRET',
-    'CRON_SECRET'
+    'OPENROUTER_EMBEDDING_MODEL',
+    'OPENROUTER_API_KEY',
+    'CRON_SECRET',
+    'OPENROUTER_LLM_MODEL',
+    'REDIS_URL'
   ]
 
   for (const envVar of requiredEnvVars) {
@@ -131,7 +139,12 @@ const envVars = (): TEnvVars => {
       SCRIPT_URL: process.env.GMAIL_SCRIPT_URL!,
       SCRIPT_SECRET: process.env.GMAIL_SCRIPT_SECRET!
     },
-    CRON_SECRET: process.env.CRON_SECRET as string
+    CRON_SECRET: process.env.CRON_SECRET as string,
+    OPENROUTER_EMBEDDING_MODEL: process.env
+      .OPENROUTER_EMBEDDING_MODEL as string,
+    OPENROUTER_LLM_MODEL: process.env.OPENROUTER_LLM_MODEL as string,
+    OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY as string,
+    REDIS_URL: process.env.REDIS_URL as string
   }
 }
 

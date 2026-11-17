@@ -6,10 +6,12 @@
 generator client {
   provider = "prisma-client"
   output   = "../generated/prisma"
+  previewFeatures = ["postgresqlExtensions"]
 }
 
 datasource db {
   provider = "postgresql"
+  extensions = [vector]
 }
 
 enum AppointmentStatus {
@@ -402,4 +404,25 @@ model Payment {
   @@index([appointmentId])
   @@index([transactionId])
   @@map("payments")
+}
+
+model DocumentEmbedding{
+  id String @id @default(uuid(7))
+  chunkKey String @unique
+  sourceId    String
+  sourceType String
+  sourceLabel String?
+  content String
+  metadata Json?
+
+  embedding Unsupported("vector(2048)")
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([sourceType], name: "idx_document_embedding_sourceType")
+  @@index([sourceId], name: "idx_document_embedding_sourceId")
+  @@map("document_embeddings")
 }
