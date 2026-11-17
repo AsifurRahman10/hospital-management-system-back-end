@@ -40,6 +40,7 @@ interface TEnvVars {
   OPENROUTER_EMBEDDING_MODEL: string
   OPENROUTER_API_KEY: string
   OPENROUTER_LLM_MODEL: string
+  REDIS_URL: string
 }
 
 const envVars = (): TEnvVars => {
@@ -70,7 +71,8 @@ const envVars = (): TEnvVars => {
     'OPENROUTER_EMBEDDING_MODEL',
     'OPENROUTER_API_KEY',
     'CRON_SECRET',
-    'OPENROUTER_LLM_MODEL'
+    'OPENROUTER_LLM_MODEL',
+    'REDIS_URL'
   ]
 
   for (const envVar of requiredEnvVars) {
@@ -141,7 +143,8 @@ const envVars = (): TEnvVars => {
     OPENROUTER_EMBEDDING_MODEL: process.env
       .OPENROUTER_EMBEDDING_MODEL as string,
     OPENROUTER_LLM_MODEL: process.env.OPENROUTER_LLM_MODEL as string,
-    OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY as string
+    OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY as string,
+    REDIS_URL: process.env.REDIS_URL as string
   }
 }
 
